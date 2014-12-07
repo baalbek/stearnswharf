@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<system>
+    <nodes>
+        <!-- dof 1: 0 0 1, 2: 0 1 0, 4: 1 0 0,
+             3: 0 1 1, 5: 1 0 1, 6: 1 1 0, 7: 1 1 1 -->
+        <node id="n1" x="0.0" dof="1" />
+        <node id="n2" x="2.5" y="1.0" dof="2" />
+        <node id="n3" x="5.0" y="2.0" dof="3" />
+    </nodes>
+</system>
+

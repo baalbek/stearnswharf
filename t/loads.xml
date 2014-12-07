@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<system>
+    <loads>
+        <load id="l1" f="1.5" y="-10" />
+        <load id="l2" f="1.2" y1="-10" y2="-5" />
+        <load id="l3" f="1.2" x="-7" />
+        <load id="l4" f="1.6" x1="-10" x2="-5" />
+        <load id="l5" f="1.0" y1="-2.3" y2="5.4" x1="0.0" x2="-5.6" />
+    </loads>
+</system>
+

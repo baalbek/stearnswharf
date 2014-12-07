@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<system>
+    <nodes>
+        <!-- dof 1: 0 0 1, 2: 0 1 0, 4: 1 0 0,
+             3: 0 1 1, 5: 1 0 1, 6: 1 1 0, 7: 1 1 1 -->
+        <node id="n1" x="0.0" dof="1" />
+        <node id="n2" x="2.5" dof="3" />
+        <node id="n3" x="5.0" dof="1" />
+    </nodes>
+
+    <pointloads>
+        <pointload  f="1.0" v="-5" ang="90" node="n2" />
+    </pointloads>
+
+    <WoodProfiles default-stclass="C22">
+        <Wood id="w1" h="450" w="90" n1="n1" n2="n2" />
+        <Wood id="w2" h="450" w="90" n1="n2" n2="n3" />
+    </WoodProfiles>
+</system>
+
