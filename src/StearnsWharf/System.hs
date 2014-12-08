@@ -25,6 +25,10 @@ import qualified StearnsWharf.XML.XmlProfiles as XP
 import qualified StearnsWharf.Wood.WoodProfiles as WP
 import qualified StearnsWharf.Steel.SteelProfiles as SP
 
+#ifdef RCS_DEBUG
+import qualified StearnsWharf.XML.Common as XC
+#endif
+
 data ProfileContext = ProfileContext {
                             steelProfiles :: [B.Beam SP.SteelProfile],
                             woodProfiles :: [B.Beam WP.WoodProfile],
@@ -92,9 +96,16 @@ runStearnsWharf doc = do
     let nodes = XN.createMatstatNodes doc
     let steels = runReader (XP.createSteelProfiles doc) (nodes,loads)
     let woods = runReader (XP.createWoodProfiles doc) (nodes,loads)
+    let Just steela = XC.xmlElement "SteelProfiles" doc
+    let steelb = XC.xmlElements "DBSteelProfile" steela 
+    let Just nodesa = XC.xmlElement "nodes" doc
+    let nodesb = XC.xmlElements "node" nodesa 
+    --putStrLn $ show xmla
+    putStrLn $ show steelb
+    putStrLn $ show nodesb 
     --putStrLn $ show loads 
     --putStrLn $ show nodes
-    putStrLn $ show woods
+    --putStrLn $ show woods
     --putStrLn $ show steels 
     --putStrLn $ show items
 #else

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<system>
+    <nodes>
+        <!-- dof 1: 0 0 1, 2: 0 1 0, 4: 1 0 0,
+             3: 0 1 1, 5: 1 0 1, 6: 1 1 0, 7: 1 1 1 -->
+        <node id="n1" x="0.0" dof="1" />
+        <node id="n2" x="2.5" dof="3" />
+        <node id="n3" x="5.0" dof="1" />
+    </nodes>
+    <loads>
+        <load id="l1" f="1.5" y="-15" />
+    </loads>
+    <SteelProfiles default-dbid="31">
+        <DBSteelProfile id="b1" load="l1" n1="n1" n2="n2" />
+        <DBSteelProfile id="b2" load="l1" n1="n2" n2="n3" />
+    </SteelProfiles>
+</system>
+

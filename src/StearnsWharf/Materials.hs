@@ -27,5 +27,5 @@ newWood wpid = case wpid of "C16" -> Wood 8000 16 3.2
 -}
 
 newSteel :: String -> Material
-newSteel wpid = case wpid of "S355" -> Steel 210000.0 355.0 ((/) 355.0 $ sqrt 2)
-                             "S235" -> Steel 210000.0 235.0 ((/) 235.0 $ sqrt 2)
+newSteel wpid = case wpid of "S355" -> Steel 200000.0 355.0 ((/) 355.0 $ sqrt 2)
+                             "S235" -> Steel 200000.0 235.0 ((/) 235.0 $ sqrt 2)

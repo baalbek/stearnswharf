@@ -18,5 +18,8 @@ testDistLoads = test [
                     assertDeflAtNode2 (head result) (-12.0) 1,
                 "testDistLoad03" ~: do 
                     result <- myTestResult "distload03"
-                    assertDeflAtNode2 (head result) (-6.0) 1
+                    assertDeflAtNode2 (head result) (-6.0) 1,
+                "testDistLoad04" ~: do 
+                    result <- myTestResult "distload04"
+                    assertDeflAtNode2 (head result) (-3.6) 1
                 ]
