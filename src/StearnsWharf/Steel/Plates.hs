@@ -18,15 +18,11 @@ instance P.Profile Plate where
     area     Plate {b, h} = b' * h'
         where b' = b/1000.0
               h' = h/1000.0
-    emodulus p   = undefined
+    emodulus p   = 200000.0
     sectionModulus Plate { b,h } = famr b' h'
         where b' = b/1000.0
               h' = h/1000.0
     secondAreaMoment Plate { b, h} = samr b' h'
         where b' = b/1000.0
               h' = h/1000.0
-#ifdef RCS_DEBUG
-    centroid Plate { h } = undefined
-#else
     centroid Plate { h } = h / 2000.0
-#endif

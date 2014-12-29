@@ -33,15 +33,15 @@ createTEHP ::
               -> Double -- ^ Tykkelse for bunnplate [mm] 
               -> HatProfile
 createTEHP h tw bo to bu tu  = TEHP topP webP botP
-    where topP = Pl.Plate "top" bo to
-          webP = Pl.Plate "web" tw (h - tw)
-          botP = Pl.Plate "bot" bu tu   
+    where topP = Pl.Plate bo to
+          webP = Pl.Plate tw (h - tw)
+          botP = Pl.Plate bu tu   
 
 instance P.Profile HatProfile where
     sigma    hp m = m / (1000.0 * (P.sectionModulus hp))
     tau      hp s = 4.0 
     area     HatProfileA { hup,plate } = (P.area hup) + (P.area plate)
-    emodulus hp   = 210000.0
+    emodulus hp   = 200000.0
     sectionModulus hat@HatProfileA { hup, plate } = sam / y 
         where sam = P.secondAreaMoment hat
               y = max c cy
@@ -75,8 +75,6 @@ instance P.Profile HatProfile where
               dt = hb + hw - cc - (P.centroid topPl) -- ^ distance form centroid top to main centroid
               dw = (P.centroid webPl) + hb - cc  -- ^ distance form centroid web to main centroid
               db = cc - (P.centroid botPl)  -- ^ distance form centroid bottom to main centroid
-
-#ifdef RCS_DEBUG
     centroid hat@HatProfileA { hup,plate } = (pca + huca) / (P.area hat)
         where pc = P.centroid plate
               huc = (P.centroid hup)  + ((Pl.h plate) / 1000.0)
@@ -92,9 +90,6 @@ instance P.Profile HatProfile where
               aw = 2.0 * (P.area webPl)
               ab = P.area botPl
               area = at + aw + ab
-#else
-    centroid hat = undefined
-#endif
               
 -- | Total høyde for profilet
 totalHeight :: HatProfile -> Double
@@ -104,9 +99,3 @@ totalHeight TEHP { webPl,botPl } = (Pl.h webPl + Pl.h botPl) / 1000.0
 webHeight :: HatProfile -> Double
 webHeight TEHP { webPl } = (Pl.h webPl + Pl.b webPl) / 1000.0
 
-jax :: Int -> Int
-#ifdef RCS_DEBUG
-jax v = 2*v
-#else
-jax v = 22*v
-#endif
