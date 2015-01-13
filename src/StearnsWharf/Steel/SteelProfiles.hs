@@ -1,7 +1,17 @@
 {-# LANGUAGE CPP,NamedFieldPuns, RecordWildCards  #-}
 -- #define RCS_DEBUG
+-- #define RCS_POSTGRESQL
 
 module StearnsWharf.Steel.SteelProfiles where
+
+#ifdef RCS_POSTGRESQL
+import Data.Ratio (Ratio)
+import Control.Applicative ((<$>),(<*>))
+import Database.PostgreSQL.Simple (connectPostgreSQL,query,close)
+import Database.PostgreSQL.Simple.FromRow (FromRow,fromRow,field)
+#endif
+
+
 
 import qualified Data.Map as Map
 import qualified StearnsWharf.Profiles as P
@@ -31,6 +41,17 @@ newIbeam ::
             Double ->         -- ^ Stegtykkelse [mm] 
             SteelProfile 
 newIbeam w' h' matr' f' web' = IBeam (w'/1000.0)  (h'/1000.0) matr' (f'/1000.0) (web'/1000.0)
+
+
+#ifdef RCS_POSTGRESQL
+instance FromRow SteelProfile where
+    fromRow = DBSteelProfile <$> field <*> field <*> field <*> field <*> field <*> field 
+
+fetchProfile :: Int -> IO SteelProfile
+fetchProfile c key = do 
+    c <- connectPostgreSQL "host='localhost' dbname='engineer' user='engineer'"
+    query c "select name, from construction.steel_beams where oid=?" [key]
+#endif
 
 steelProfileOf :: Int -> SteelProfile
 steelProfileOf key = result 
