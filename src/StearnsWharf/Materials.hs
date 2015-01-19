@@ -1,5 +1,7 @@
 module StearnsWharf.Materials where
 
+import Data.Ratio (Ratio)
+
 data Material = Wood { 
                        emodulus, 
                        mySigma, 
@@ -11,6 +13,8 @@ data Material = Wood {
                            emodulus, mySigma, myTau :: Double } 
                 | Steel { 
                           emodulus, mySigma, myTau :: Double } 
+                | DbSteel { 
+                          emodulus2, mySigma2, myTau2 :: Ratio Integer } 
                 | Concrete { 
                              emodulus :: Double } 
                 deriving Show

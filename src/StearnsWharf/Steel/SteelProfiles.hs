@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP,NamedFieldPuns, RecordWildCards  #-}
+{-# LANGUAGE CPP,NamedFieldPuns,RecordWildCards,OverloadedStrings #-}
 -- #define RCS_DEBUG
 -- #define RCS_POSTGRESQL
 
@@ -6,9 +6,12 @@ module StearnsWharf.Steel.SteelProfiles where
 
 #ifdef RCS_POSTGRESQL
 import Data.Ratio (Ratio)
+import Control.Monad (liftM3)
 import Control.Applicative ((<$>),(<*>))
-import Database.PostgreSQL.Simple (connectPostgreSQL,query,close)
+import Database.PostgreSQL.Simple (connectPostgreSQL,query,query_,close)
 import Database.PostgreSQL.Simple.FromRow (FromRow,fromRow,field)
+import Database.PostgreSQL.Simple.Types (Only(..))
+import Data.Ratio (Ratio)
 #endif
 
 
@@ -17,20 +20,35 @@ import qualified Data.Map as Map
 import qualified StearnsWharf.Profiles as P
 import qualified StearnsWharf.Materials as M
 
+#ifdef RCS_POSTGRESQL
+type PgNum = Ratio Integer 
+#endif
+
 data SteelProfile = IBeam { 
                             width :: Double,
                             height :: Double,
                             matr   :: M.Material,
                             flange :: Double,
                             web :: Double }
+#ifdef RCS_POSTGRESQL
                     | DBSteelProfile { 
-                                     name :: String, 
-                                     width  :: Double,
-                                     height :: Double,
-                                     aa :: Double,
-                                     ww :: Double,
-                                     ii :: Double,
-                                     matr :: M.Material } 
+                            name :: String,
+                            b :: Int,
+                            h :: Int,
+                            ar :: Int,
+                            wely :: PgNum,
+                            iiy :: PgNum,
+                            matr :: M.Material }
+#else
+                    | DBSteelProfile { 
+                            name :: String, 
+                            width  :: Double,
+                            height :: Double,
+                            aa :: Double,
+                            ww :: Double,
+                            ii :: Double,
+                            matr :: M.Material } 
+#endif
             deriving Show
 
 newIbeam :: 
@@ -43,16 +61,51 @@ newIbeam ::
 newIbeam w' h' matr' f' web' = IBeam (w'/1000.0)  (h'/1000.0) matr' (f'/1000.0) (web'/1000.0)
 
 
+
+instance P.Profile SteelProfile where
+    desc     (DBSteelProfile {name}) = name
+    desc     (IBeam _ _ _ _ _) = "IBeam"
+    sigma    hp moment = moment / (1000.0 * (P.sectionModulus hp)) 
+    tau      hp shr = (3.0*shr) / (2000.0 * (P.area hp))
+#ifdef RCS_POSTGRESQL
+    area     (DBSteelProfile {ar}) = fromIntegral ar 
+#else
+    area     (DBSteelProfile {aa}) = aa
+#endif
+    area     (IBeam {width,height,flange,web}) = outerA - innerA
+        where outerA = width*height
+              b' = width - web
+              h' = height - (2*flange)
+              innerA = b' * h'
+    emodulus hp   = 1000 * (M.emodulus $ matr hp)
+#ifdef RCS_POSTGRESQL
+    sectionModulus (DBSteelProfile {wely}) = fromRational wely
+#else
+    sectionModulus (DBSteelProfile {ww}) = ww
+#endif
+    sectionModulus (IBeam _ _ _ _ _) = undefined
+#ifdef RCS_POSTGRESQL
+    secondAreaMoment (DBSteelProfile {iiy}) = fromRational iiy
+#else
+    secondAreaMoment (DBSteelProfile {ii}) = ii
+#endif
+    secondAreaMoment (IBeam {width,height,flange,web}) = outerW - (2*innerW)
+        where outerW = width*(height**2)/6.0
+              b' = (width - web) / 2.0
+              h' = height - (2*flange)
+              innerW = b'*(h'**2) / 6.0
+    centroid _ = undefined
+
 #ifdef RCS_POSTGRESQL
 instance FromRow SteelProfile where
-    fromRow = DBSteelProfile <$> field <*> field <*> field <*> field <*> field <*> field 
+    fromRow = DBSteelProfile <$> field <*> field <*> field <*> field <*> field <*> field <*> liftM3 M.DbSteel field field field
 
-fetchProfile :: Int -> IO SteelProfile
-fetchProfile c key = do 
-    c <- connectPostgreSQL "host='localhost' dbname='engineer' user='engineer'"
-    query c "select name, from construction.steel_beams where oid=?" [key]
-#endif
-
+steelProfileOf :: Integer -> IO SteelProfile
+steelProfileOf key = do 
+    c <- connectPostgreSQL "host='xochitecatl2' dbname='engineer' user='engineer'"
+    r <- (query c "select name,b,h,area,w_el_y,i_y,200000.0 as emodule,355.0 as sigma,251.0 as tau from construction.steel_beams where oid=?" [key]) :: IO [SteelProfile]
+    return (head r)
+#else 
 steelProfileOf :: Int -> SteelProfile
 steelProfileOf key = result 
     where Just result = Map.lookup key mySteelProfiles  
@@ -60,32 +113,6 @@ steelProfileOf key = result
 steelProfileOf2 :: String -> Maybe SteelProfile
 steelProfileOf2 key = Map.lookup key' mySteelProfiles  
     where key' = read key
-
-instance P.Profile SteelProfile where
-    desc     (DBSteelProfile {name}) = name
-    desc     (IBeam _ _ _ _ _) = "IBeam"
-    sigma    hp moment = moment / (1000.0 * (P.sectionModulus hp)) 
-    tau      hp shr = (3.0*shr) / (2000.0 * (P.area hp))
-    area     (DBSteelProfile {aa}) = aa
-    area     (IBeam {width,height,flange,web}) = outerA - innerA
-        where outerA = width*height
-              b' = width - web
-              h' = height - (2*flange)
-              innerA = b' * h'
-    emodulus hp   = 1000 * (M.emodulus $ matr hp)
-    sectionModulus (DBSteelProfile {ww}) = ww
-    sectionModulus (IBeam _ _ _ _ _) = undefined
-    secondAreaMoment (DBSteelProfile {ii}) = ii
-    secondAreaMoment (IBeam {width,height,flange,web}) = outerW - (2*innerW)
-        where outerW = width*(height**2)/6.0
-              b' = (width - web) / 2.0
-              h' = height - (2*flange)
-              innerW = b'*(h'**2) / 6.0
-#ifdef RCS_DEBUG
-    centroid _ = undefined
-#else
-    centroid _ = undefined
-#endif
 
 mySteelProfiles :: Map.Map Int SteelProfile
 mySteelProfiles = Map.fromList [
@@ -204,4 +231,4 @@ mySteelProfiles = Map.fromList [
             (113, DBSteelProfile "IPE 300" 150 300 0.00538 0.0005571 0.00008356 mysteel)
             ]
     where mysteel = M.newSteel "S355"
-
+#endif
