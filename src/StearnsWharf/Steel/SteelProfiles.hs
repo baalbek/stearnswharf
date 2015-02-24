@@ -105,6 +105,10 @@ steelProfileOf key = do
     c <- connectPostgreSQL "host='xochitecatl2' dbname='engineer' user='engineer'"
     r <- (query c "select name,b,h,area,w_el_y,i_y,200000.0 as emodule,355.0 as sigma,251.0 as tau from construction.steel_beams where oid=?" [key]) :: IO [SteelProfile]
     return (head r)
+
+steelProfileOf2 :: String -> IO SteelProfile
+steelProfileOf2 key = steelProfileOf key'
+    where key' = read key
 #else 
 steelProfileOf :: Int -> SteelProfile
 steelProfileOf key = result 

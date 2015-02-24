@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                stearnswharf
-version:             1.2.1
+version:             1.3.0
 -- synopsis:            
 -- description:         
 -- license:             
@@ -14,7 +14,7 @@ category:            Structural Engineering
 build-type:          Simple
 cabal-version:       >=1.8
 
-executable stearnswharf-1.2.1
+executable stearnswharf-1.3.0
   main-is: Main.hs 
   -- main-is:             
   -- other-modules:       
@@ -24,5 +24,6 @@ executable stearnswharf-1.2.1
                        ,containers >= 0.5.0.0
                        ,xml >= 1.3.13
                        ,mtl >= 2.2.1
+                       ,postgresql-simple >= 0.4.6.0
   hs-source-dirs: src
   ghc-options: -Wall -fno-warn-unused-do-bind
