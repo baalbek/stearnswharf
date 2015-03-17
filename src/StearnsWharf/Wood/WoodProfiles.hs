@@ -2,6 +2,8 @@
 
 module StearnsWharf.Wood.WoodProfiles where
 
+import Text.Printf (printf)
+
 import qualified StearnsWharf.Profiles as P
 import qualified StearnsWharf.Materials as M
 
@@ -26,7 +28,7 @@ newWoodProfile stc w h = case stc of
     _ -> undefined 
 
 instance P.Profile WoodProfile where
-    desc WoodProfile { matr } = "Wood Profile " ++ (M.stClass matr)
+    desc WoodProfile { width,height,matr } = printf "Wood Profile %.0fx%.0fmm %s" width height  (M.stClass matr)
     sigma          wp moment = moment / (1000.0 * (P.sectionModulus wp)) 
     tau            wp shr = (3.0*shr) / (2000.0 * (P.area wp))
     area           WoodProfile { width,height } = (width * height) / 1000000.0
