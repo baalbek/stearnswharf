@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP,NamedFieldPuns,RecordWildCards  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards #-}
 module StearnsWharf.Beams where
 
 -- #define RCS_DEBUG

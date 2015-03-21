@@ -3,15 +3,24 @@ module StearnsWharf.System where
 
 -- #define RCS_DEBUG
 
+{-
 import Control.Monad.Reader (runReader)
-
-import qualified Text.XML.Light as X 
-
 import Data.Map (elems)
 import Numeric.LinearAlgebra (Matrix,Vector)
 import Data.Packed.ST (newMatrix,runSTMatrix,newVector,runSTVector)
 import Numeric.Container ((<>))
 import Numeric.LinearAlgebra.Algorithms (inv)
+-}
+
+runStearnsWharf :: Int -> -- ^ System
+                   Int -> -- ^ Load Case 
+                   IO ()
+runStearnsWharf s lc = 
+    putStrLn (show s) >> 
+    putStrLn (show lc) >> 
+    return ()
+
+{- --------------------- GAMMEL KODE 
 
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L
@@ -115,3 +124,5 @@ runStearnsWharf doc = do
     OUT.printSummary result
     return () 
 #endif
+
+-}

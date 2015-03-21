@@ -1,19 +1,27 @@
-{-# LANGUAGE NamedFieldPuns,RecordWildCards,CPP #-}
+{-# LANGUAGE FlexibleInstances,MultiParamTypeClasses,DeriveDataTypeable #-}
 -- #define RCS_DEMO
 
-import System.Environment (getArgs)
-import qualified Text.XML.Light as X 
-import qualified StearnsWharf.System as S
+import GHC.Float (float2Double)
+import System.Console.CmdLib -- (Attributes,Group,Help,ArgHelp,Default,RecordCommand)
+
+import StearnsWharf.System (runStearnsWharf)
+
+data Main = Main { 
+        s :: Int,
+        lc :: Int
+    }
+    deriving (Typeable, Data, Eq)
+
+instance Attributes Main where
+    attributes _ = group "Options" [
+            s      %> [ Group "System", Positional 0, Required True ] ,
+            lc     %> [ Group "Load", Help "Load case", ArgHelp "LOADCASE", Default (1 :: Int) ] 
+        ]
+
+instance RecordCommand Main where
+    mode_summary _ = "Stearns Wharf Structural Matrix Analysis"
 
 main :: IO ()
-main = do
-#ifdef RCS_DEMO
-    --s <- readFile "/home/rcs/opt/haskell/stearnswharf/demo/project2.xml"
-    s <- readFile "/home/rcs/opt/haskell/stearnswharf/t/distload01.xml"
-#else
-    [fileName] <- getArgs
-    s <- readFile fileName 
-#endif
-    case X.parseXMLDoc s of
-        Nothing -> error "Failed to parse xml"
-        Just doc -> S.runStearnsWharf doc
+main = getArgs >>= executeR Main {} >>= \opts -> 
+    runStearnsWharf (s opts) (lc opts) >>
+    return ()

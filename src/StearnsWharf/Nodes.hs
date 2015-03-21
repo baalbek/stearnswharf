@@ -2,7 +2,7 @@ module StearnsWharf.Nodes where
 
 import qualified Data.Map as Map
 
-type NodeId = String
+type NodeId = Int
 
 type Index = Int
 
@@ -30,6 +30,7 @@ data Node = Node {  nodeId :: NodeId,
                 } 
             deriving (Show)
 
+{-
 type NodeMap = Map.Map String Node
 
 instance Eq Node where
@@ -105,3 +106,4 @@ indexSeeds n1 n2 = foldr (:) ip2 ip1
           d1 = dof n1
           d2 = dof n2
 
+-}
