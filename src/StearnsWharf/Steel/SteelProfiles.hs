@@ -228,7 +228,9 @@ mySteelProfiles = Map.fromList [
             (110, DBSteelProfile "HE 1000x438" 305 1026 0.05572 0.01774 0.009098 mysteel),
             (111, DBSteelProfile "HE 1000x494" 309 1036 0.06291 0.019845 0.01028 mysteel),
             (112, DBSteelProfile "HE 1000x584" 314 1056 0.07437 0.0236 0.012461 mysteel),
-            (113, DBSteelProfile "IPE 300" 150 300 0.00538 0.0005571 0.00008356 mysteel)
+            (113, DBSteelProfile "IPE 300" 150 300 0.00538  0.0005571  0.00008356 mysteel),
+            (114, DBSteelProfile "IPE 80"   46  80 0.000764 0.00002003 0.000000801 mysteel),
+            (115, DBSteelProfile "IPE 180"  91 180 0.00239  0.0001463  0.00001317  mysteel)
             ]
     where mysteel = M.newSteel "S355"
 #endif
