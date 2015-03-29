@@ -1,3 +1,8 @@
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module StearnsWharf.Nodes where
 
 import qualified Data.Map as Map
@@ -29,6 +34,16 @@ data Node = Node {  nodeId :: NodeId,
                     globNdx :: Index -- global index
                 } 
             deriving (Show)
+
+systemIndexX :: Node -> Maybe Int
+systemIndexX (Node _ _ _ (Dof x' _ _) gi) | x' == 0 = Nothing
+                                          | otherwise = Just gi
+
+systemIndexY :: Node -> Maybe Int
+systemIndexY (Node _ _ _ (Dof x' y' _) gi) | y' == 0 = Nothing
+                                           | x' == 0 = Just gi 
+                                           | otherwise = Just $ gi + 1
+
 
 {-
 type NodeMap = Map.Map String Node
