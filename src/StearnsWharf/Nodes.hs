@@ -35,19 +35,8 @@ data Node = Node {  nodeId :: NodeId,
                 } 
             deriving (Show)
 
-systemIndexX :: Node -> Maybe Int
-systemIndexX (Node _ _ _ (Dof x' _ _) gi) | x' == 0 = Nothing
-                                          | otherwise = Just gi
-
-systemIndexY :: Node -> Maybe Int
-systemIndexY (Node _ _ _ (Dof x' y' _) gi) | y' == 0 = Nothing
-                                           | x' == 0 = Just gi 
-                                           | otherwise = Just $ gi + 1
-
-
 type NodeMap = Map.Map Int Node
 
-{-
 instance Eq Node where
     (==) n1 n2 = (globNdx n1) == (globNdx n2)
 
@@ -120,5 +109,3 @@ indexSeeds n1 n2 = foldr (:) ip2 ip1
           ip2 = indexSeed d2 SecondNode $ globNdx n2 
           d1 = dof n1
           d2 = dof n2
-
--}

@@ -3,40 +3,23 @@ module StearnsWharf.System where
 
 -- #define RCS_DEBUG
 
-{-
-import Control.Monad.Reader (runReader)
 import Data.Map (elems)
 import Numeric.LinearAlgebra (Matrix,Vector)
 import Data.Packed.ST (newMatrix,runSTMatrix,newVector,runSTVector)
 import Numeric.Container ((<>))
 import Numeric.LinearAlgebra.Algorithms (inv)
--}
 
-runStearnsWharf :: Int -> -- ^ System
-                   Int -> -- ^ Load Case 
-                   IO ()
-runStearnsWharf s lc = 
-    putStrLn (show s) >> 
-    putStrLn (show lc) >> 
-    return ()
+import Database.PostgreSQL.Simple (close)
 
-{- --------------------- GAMMEL KODE 
+import StearnsWharf.Common (getConnection)
 
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L
 import qualified StearnsWharf.Beams as B
 import qualified StearnsWharf.Output as OUT
 
-import qualified StearnsWharf.XML.XmlNodes as XN
-import qualified StearnsWharf.XML.XmlLoads as XL
-import qualified StearnsWharf.XML.XmlProfiles as XP
-
 import qualified StearnsWharf.Wood.WoodProfiles as WP
 import qualified StearnsWharf.Steel.SteelProfiles as SP
-
-#ifdef RCS_DEBUG
-import qualified StearnsWharf.XML.Common as XC
-#endif
 
 data ProfileContext = ProfileContext {
                             steelProfiles :: [B.Beam SP.SteelProfile],
@@ -87,6 +70,20 @@ beamResults ProfileContext { steelProfiles,woodProfiles } vUltimateLimit vServic
           steelResults | null steelProfiles == True = []
                        | otherwise = map (OUT.collectResult vUltimateLimit vServicabilityLimit) steelProfiles 
 
+
+runStearnsWharf :: String    -- ^ Database Host  
+                   -> String -- ^ Database Name
+                   -> String -- ^ Database User 
+                   -> Int    -- ^ System Id
+                   -> IO ()
+runStearnsWharf host dbname user sysId = 
+    getConnection host dbname user >>= \c ->
+    close c >> 
+    return ()
+
+
+
+{-
 stearnsWharfResult :: X.Element -> [OUT.BeamResult]
 stearnsWharfResult doc = beamResults ctx rf rd
     where loads = XL.createLoads doc
@@ -124,5 +121,4 @@ runStearnsWharf doc = do
     OUT.printSummary result
     return () 
 #endif
-
 -}

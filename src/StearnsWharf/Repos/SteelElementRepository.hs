@@ -12,7 +12,9 @@ import Database.PostgreSQL.Simple (Connection,query)
 import Database.PostgreSQL.Simple.FromRow (FromRow,fromRow,field)
 import Database.PostgreSQL.Simple.Types (Only(..),In(..))
 
+import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L
+import qualified StearnsWharf.Beams as B
 import qualified StearnsWharf.Materials as M
 import qualified StearnsWharf.Steel.SteelProfiles as S
 
@@ -30,12 +32,33 @@ instance FromRow S.SteelProfile where
 instance FromRow SteelElement where
     fromRow = SteelElement <$> field <*> field <*> field <*> field <*> field 
 
-steelElements :: Int -- ^ System Id
+systemSteelDTO:: Int -- ^ System Id
                  -> Connection
                  -> IO [SteelElement]
-steelElements sysId conn = 
+systemSteelDTO sysId conn = 
     (query conn "select oid,n1,n2,p_oid,ld_id from construction.v_steel_elements where sys_id=?" [sysId]) :: IO [SteelElement]
 
+steelElement2Beam :: N.NodeMap
+                     -> L.LoadMap
+                     -> S.SteelProfileMap 
+                     -> SteelElement 
+                     -> B.Beam S.SteelProfile
+steelElement2Beam nm lm steelm el = B.Bjlk33 (elId el) n1' n2' steel ld
+    where Just n1' = Map.lookup (n1 el) nm
+          Just n2' = Map.lookup (n2 el) nm
+          Just steel = Map.lookup (profileId el) steelm
+          ld = loadId el >>= flip Map.lookup lm
+
+systemSteelElements :: Int -- ^ System Id
+                       -> Connection
+                       -> N.NodeMap
+                       -> L.LoadMap
+                       -> IO [B.Beam S.SteelProfile]
+systemSteelElements sysId conn nm lm = 
+    systemSteelDTO sysId conn >>= \dto ->
+    systemSteelAsMap sysId conn >>= \steelm ->
+    let steelElement2Beam' = steelElement2Beam nm lm steelm in 
+    return (map steelElement2Beam' dto)
 
 systemSteelProfiles :: Int -- ^ System Id 
                        -> Connection

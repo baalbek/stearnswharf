@@ -1,10 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 module StearnsWharf.Common where
 
+import Text.Printf (printf)
 import Database.PostgreSQL.Simple (Connection)
 import Database.PostgreSQL.Simple (connectPostgreSQL)
 
-import Data.ByteString (ByteString)
+import qualified Data.ByteString.UTF8 as UTF8 
 import Numeric.LinearAlgebra (Vector)
 import Numeric.Container (vecdisp,dispf)
 
@@ -46,8 +47,9 @@ samr b h = b * h**3 / 12.0
 famr :: Double -> Double -> Double
 famr b h = b * h**2 / 6.0
 
-connectString :: ByteString
-connectString = "host='xochitecatl2' dbname='engineer' user='engineer'"
-
-getConnection :: IO Connection
-getConnection = connectPostgreSQL connectString
+getConnection :: String    -- ^ Database Host  
+                 -> String -- ^ Database Name
+                 -> String -- ^ Database User 
+                 -> IO Connection
+getConnection host dbname user = connectPostgreSQL connectString
+    where connectString = UTF8.fromString (printf "host='%s' dbname='%s' user='%s'" host dbname user :: String)
