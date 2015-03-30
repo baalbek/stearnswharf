@@ -16,29 +16,40 @@ import qualified StearnsWharf.Loads as L
 import qualified StearnsWharf.Materials as M
 import qualified StearnsWharf.Steel.SteelProfiles as S
 
+data SteelElement = 
+    SteelElement {
+        elId :: Int,
+        n1 :: Int,
+        n2 :: Int,
+        profileId :: Int,
+        loadId :: Maybe Int } deriving Show
+
 instance FromRow S.SteelProfile where
     fromRow = S.SteelProfile <$> field <*> field <*> field <*> field <*> field <*> field <*> field <*> liftM3 M.Steel field field field
 
-systemSteelProfiles :: [Int]  -- ^ steel_beams.oid
+instance FromRow SteelElement where
+    fromRow = SteelElement <$> field <*> field <*> field <*> field <*> field 
+
+steelElements :: Int -- ^ System Id
+                 -> Connection
+                 -> IO [SteelElement]
+steelElements sysId conn = 
+    (query conn "select oid,n1,n2,p_oid,ld_id from construction.v_steel_elements where sys_id=?" [sysId]) :: IO [SteelElement]
+
+
+systemSteelProfiles :: Int -- ^ System Id 
                        -> Connection
                        -> IO [S.SteelProfile]
-systemSteelProfiles keys conn = 
-    (query conn "select oid,name,b,h,area,w_el_y,i_y,200000.0 as emodule,355.0 as sigma,251.0 as tau from construction.steel_beams where oid in ?" 
-        (Only (In keys))) :: IO [S.SteelProfile]
-
-uniqueSystemSteelIds :: Int -- ^ System Id 
-                      -> Connection 
-                      -> IO [Int]
-uniqueSystemSteelIds sysId conn = 
-    ((query conn "select distinct(profile_id) from construction.steel_elements where sys_id=?" [sysId]) :: IO [Only Int]) >>= \x ->
-    return (map fromOnly x)
+systemSteelProfiles sysId conn = 
+    (query conn 
+        "select x.oid,x.name,x.b,x.h,x.area,x.w_el_y,x.i_y,200000.0 as emodule,355.0 as sigma,251.0 as tau from construction.steel_beams x join construction.steel_elements e on e.profile_id=x.oid where e.sys_id=?" [sysId]) 
+        :: IO [S.SteelProfile]
 
 systemSteelAsMap :: Int -- ^ System Id 
                     -> Connection
-                    -> IO SteelProfileMap 
+                    -> IO S.SteelProfileMap 
 systemSteelAsMap sysId conn = 
-    (uniqueSystemSteelIds sysId conn) >>= \uc ->
-    systemSteelProfiles uc conn >>= \profiles ->
+    systemSteelProfiles sysId conn >>= \profiles ->
     return (Map.fromList (map asListItem profiles))
         where asListItem x = (S.profileId x, x)
 
