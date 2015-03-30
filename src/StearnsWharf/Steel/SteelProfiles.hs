@@ -11,8 +11,11 @@ import qualified StearnsWharf.Materials as M
 
 type PgNum = Ratio Integer 
 
+type SteelProfileId = Int
+
 data SteelProfile = 
     SteelProfile { 
+        profileId :: SteelProfileId, 
         name :: String,
         b :: Int,
         h :: Int,
@@ -21,6 +24,8 @@ data SteelProfile =
         iiy :: PgNum,
         matr :: M.Material }
     deriving Show
+
+type SteelProfileMap = Map.Map Int SteelProfile
 
 instance P.Profile SteelProfile where
     desc     (SteelProfile {name}) = name

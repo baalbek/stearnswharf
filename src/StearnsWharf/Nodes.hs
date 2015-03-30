@@ -45,9 +45,9 @@ systemIndexY (Node _ _ _ (Dof x' y' _) gi) | y' == 0 = Nothing
                                            | otherwise = Just $ gi + 1
 
 
-{-
-type NodeMap = Map.Map String Node
+type NodeMap = Map.Map Int Node
 
+{-
 instance Eq Node where
     (==) n1 n2 = (globNdx n1) == (globNdx n2)
 

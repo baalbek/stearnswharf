@@ -5,6 +5,7 @@
 
 module StearnsWharf.Loads where
 
+import qualified Data.Map as Map
 import Control.Monad.ST
 
 import Data.Packed.ST (STVector,modifyVector)
@@ -27,6 +28,8 @@ data Load =
         loads :: [Load]
     }
     deriving Show
+
+type LoadMap = Map.Map Int Load
 
 data PointLoad = 
     PointLoad { ploadId :: LoadId, 

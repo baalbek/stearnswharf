@@ -1,5 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
 module StearnsWharf.Common where
 
+import Database.PostgreSQL.Simple (Connection)
+import Database.PostgreSQL.Simple (connectPostgreSQL)
+
+import Data.ByteString (ByteString)
 import Numeric.LinearAlgebra (Vector)
 import Numeric.Container (vecdisp,dispf)
 
@@ -41,4 +46,8 @@ samr b h = b * h**3 / 12.0
 famr :: Double -> Double -> Double
 famr b h = b * h**2 / 6.0
 
+connectString :: ByteString
+connectString = "host='xochitecatl2' dbname='engineer' user='engineer'"
 
+getConnection :: IO Connection
+getConnection = connectPostgreSQL connectString

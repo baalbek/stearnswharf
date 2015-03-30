@@ -5,9 +5,10 @@
 
 module StearnsWharf.Repos.LoadRepository where
 
+import qualified Data.Map as Map
 import Control.Monad (liftM3)
 import Control.Applicative ((<$>),(<*>))
-import Database.PostgreSQL.Simple (connectPostgreSQL,query,query_,close)
+import Database.PostgreSQL.Simple (Connection,query)
 import Database.PostgreSQL.Simple.FromRow (FromRow,fromRow,field)
 import Database.PostgreSQL.Simple.Types (Only(..))
 
@@ -17,8 +18,15 @@ import qualified StearnsWharf.Loads as L
 instance FromRow L.Load where
     fromRow = L.Load <$> field <*> field <*> field <*> field <*> field <*> field 
 
-fetchDistLoads :: Integer -> -- ^ System Id
-                  IO [L.Load]
-fetchDistLoads sysId = 
-    connectPostgreSQL "host='xochitecatl2' dbname='engineer' user='engineer'" >>= \c -> 
-    (query c "select oid,qy1,qy2,qx1,qx2,lf from construction.dist_loads where sys_id=?" [sysId]) :: IO [L.Load]
+fetchDistLoads :: Int -- ^ System Id
+                  -> Connection 
+                  -> IO [L.Load]
+fetchDistLoads sysId conn = 
+    (query conn "select oid,qy1,qy2,qx1,qx2,lf from construction.dist_loads where sys_id=?" [sysId]) :: IO [L.Load]
+
+fetchDistLoadsAsMap :: Int  -- ^ System Id
+                       -> Connection 
+                       -> IO L.LoadMap
+fetchDistLoadsAsMap sysId conn = fetchDistLoads sysId conn >>= \loads ->
+    return (Map.fromList (map asListItem loads))
+        where asListItem x = (L.loadId x, x)
