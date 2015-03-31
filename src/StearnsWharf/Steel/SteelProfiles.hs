@@ -19,7 +19,6 @@ data SteelProfile =
         name :: String,
         b :: Int,
         h :: Int,
-        -- ar :: Int,
         flange :: PgNum,
         web :: PgNum,
         wely :: PgNum,
@@ -33,7 +32,6 @@ instance P.Profile SteelProfile where
     desc     (SteelProfile {name}) = name
     sigma    hp moment = moment / (1000.0 * (P.sectionModulus hp)) 
     tau      hp shr = (3.0*shr) / (2000.0 * (P.area hp))
-    -- area     (SteelProfile {ar}) = (fromIntegral ar) / 1000000.0
     area     (SteelProfile { h,flange,web }) = ((h' - flange') * web') / 1000000.0
         where flange' = 2 * (fromRational flange)
               web' = fromRational web
