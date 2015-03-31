@@ -3,10 +3,14 @@
 
 import GHC.Float (float2Double)
 import System.Console.CmdLib -- (Attributes,Group,Help,ArgHelp,Default,RecordCommand)
+import Text.Printf (printf)
 
 import StearnsWharf.System (runStearnsWharf)
 
 data Main = Main { 
+        h :: String,
+        db :: String,
+        u :: String,
         s :: Int,
         lc :: Int
     }
@@ -14,6 +18,9 @@ data Main = Main {
 
 instance Attributes Main where
     attributes _ = group "Options" [
+            h      %> [ Group "Database", Help "Database host", Default "xochitecatl2" ] ,
+            db     %> [ Group "Database", Help "Database name", Default "engineer" ] ,
+            u      %> [ Group "Database", Help "Database user", Default "engineer" ] ,
             s      %> [ Group "System", Positional 0, Required True ] ,
             lc     %> [ Group "Load", Help "Load case", ArgHelp "LOADCASE", Default (1 :: Int) ] 
         ]
@@ -23,5 +30,6 @@ instance RecordCommand Main where
 
 main :: IO ()
 main = getArgs >>= executeR Main {} >>= \opts -> 
-    runStearnsWharf (s opts) (lc opts) >>
+    -- putStrLn (printf "host=%s, dbname=%s, user=%s, sys.id=%d, load case=%d" (h opts) (db opts) (u opts) (s opts) (lc opts)) >>
+    runStearnsWharf (h opts) (db opts) (u opts) (s opts) (lc opts) >>
     return ()

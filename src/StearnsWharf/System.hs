@@ -13,6 +13,9 @@ import Database.PostgreSQL.Simple (close)
 
 import StearnsWharf.Common (getConnection)
 
+import qualified StearnsWharf.Repos.NodeRepository as NR
+import qualified StearnsWharf.Repos.LoadRepository as LR
+import qualified StearnsWharf.Repos.SteelElementRepository as SR
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L
 import qualified StearnsWharf.Beams as B
@@ -75,9 +78,16 @@ runStearnsWharf :: String    -- ^ Database Host
                    -> String -- ^ Database Name
                    -> String -- ^ Database User 
                    -> Int    -- ^ System Id
+                   -> Int    -- ^ Load Case
                    -> IO ()
-runStearnsWharf host dbname user sysId = 
+runStearnsWharf host dbname user sysId lc = 
     getConnection host dbname user >>= \c ->
+    NR.fetchNodesAsMap 1 c >>= \nx -> 
+    LR.fetchDistLoadsAsMap 1 c >>= \lx ->
+    -- SR.systemSteelElements 1 c nx lx >>= \x ->
+    --putStrLn (show (head x)) >>
+    let numDof = systemDof (elems nx) in 
+    putStrLn (show numDof) >>
     close c >> 
     return ()
 
