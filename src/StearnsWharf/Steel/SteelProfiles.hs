@@ -31,9 +31,9 @@ instance P.Profile SteelProfile where
     desc     (SteelProfile {name}) = name
     sigma    hp moment = moment / (1000.0 * (P.sectionModulus hp)) 
     tau      hp shr = (3.0*shr) / (2000.0 * (P.area hp))
-    area     (SteelProfile {ar}) = fromIntegral ar 
+    area     (SteelProfile {ar}) = (fromIntegral ar) / 1000000.0
     emodulus hp   = 1000 * ((fromRational . M.emodulus2 . matr) hp)
-    sectionModulus (SteelProfile {wely}) = fromRational wely
-    secondAreaMoment (SteelProfile {iiy}) = fromRational iiy
+    sectionModulus (SteelProfile {wely}) = (fromRational wely) / 1000000.0
+    secondAreaMoment (SteelProfile {iiy}) = (fromRational iiy) / 100000000.0
     centroid _ = undefined
 

@@ -36,7 +36,7 @@ systemSteelDTO:: Int -- ^ System Id
                  -> Connection
                  -> IO [SteelElement]
 systemSteelDTO sysId conn = 
-    (query conn "select oid,n1,n2,p_oid,ld_id from construction.v_steel_elements where sys_id=?" [sysId]) :: IO [SteelElement]
+    (query conn "select oid,n1,n2,p_oid,ld_id from construction.v_steel_elements where sys_id=? order by x1,y1" [sysId]) :: IO [SteelElement]
 
 steelElement2Beam :: N.NodeMap
                      -> L.LoadMap

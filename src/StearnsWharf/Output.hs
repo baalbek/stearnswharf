@@ -64,7 +64,7 @@ maxProperty maxFun (x:xs)
 
 printNodeResults :: NodeResult -> IO ()
 printNodeResults nr = do
-    printf "\tNode: [%s]\n" $ nrId nr
+    printf "\tNode: [%d]\n" $ nrId nr
     printf "\t\tNormal: %.2f kN\n" $ normalf nr
     printf "\t\tShear: %.2f kN\n" $ shear nr 
     printf "\t\tMoment: %.2f kNm\n" $ moment nr
@@ -76,7 +76,7 @@ printNodeResults nr = do
 
 printResults :: BeamResult -> IO ()
 printResults BeamResult { brId,desc,nr1,nr2 } = do 
-    printf "Beam: %s [%s]\n" desc brId
+    printf "Beam: %s [%d]\n" desc brId
     printNodeResults $ nr1
     printNodeResults $ nr2
 
@@ -87,7 +87,7 @@ printSummary brs = do
     let maxM = maxProperty moment nodes
     let maxS = maxProperty shear nodes
     let maxV = maxProperty yTrans nodes
-    printf "Max moment [%s]: %.2f kNm\n" (nrId maxM) (moment maxM)
-    printf "Max shear [%s]: %.2f kN\n" (nrId maxS) (shear maxS)
-    printf "Max deflection [%s]: %.2f mm\n" (nrId maxV) (1000.0 * (yTrans maxV))
+    printf "Max moment [%d]: %.2f kNm\n" (nrId maxM) (moment maxM)
+    printf "Max shear [%d]: %.2f kN\n" (nrId maxS) (shear maxS)
+    printf "Max deflection [%d]: %.2f mm\n" (nrId maxV) (1000.0 * (yTrans maxV))
 

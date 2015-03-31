@@ -80,14 +80,17 @@ runStearnsWharf :: String    -- ^ Database Host
                    -> Int    -- ^ System Id
                    -> Int    -- ^ Load Case
                    -> IO ()
-runStearnsWharf host dbname user sysId lc = 
+runStearnsWharf host dbname user sysId loadCase = 
     getConnection host dbname user >>= \c ->
-    NR.fetchNodesAsMap 1 c >>= \nx -> 
-    LR.fetchDistLoadsAsMap 1 c >>= \lx ->
-    -- SR.systemSteelElements 1 c nx lx >>= \x ->
-    --putStrLn (show (head x)) >>
-    let numDof = systemDof (elems nx) in 
-    putStrLn (show numDof) >>
+    NR.fetchNodesAsMap sysId c >>= \nx -> 
+    LR.fetchDistLoadsAsMap sysId loadCase c >>= \lx ->
+    SR.systemSteelElements sysId c nx lx >>= \steels ->
+    let numDof = systemDof (elems nx)  
+        ctx = ProfileContext steels [] [] numDof 
+        (rf,rd) = calcDeflections ctx 
+        result = beamResults ctx rf rd in
+    mapM_ OUT.printResults result >>
+    OUT.printSummary result >> 
     close c >> 
     return ()
 
