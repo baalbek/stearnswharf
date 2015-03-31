@@ -83,7 +83,7 @@ runStearnsWharf :: String    -- ^ Database Host
 runStearnsWharf host dbname user sysId loadCase = 
     getConnection host dbname user >>= \c ->
     NR.fetchNodesAsMap sysId c >>= \nx -> 
-    LR.fetchDistLoadsAsMap sysId loadCase c >>= \lx ->
+    LR.fetchDistLoadsAsMap sysId c >>= \lx ->
     SR.systemSteelElements sysId loadCase c nx lx >>= \steels ->
     let numDof = systemDof (elems nx)  
         ctx = ProfileContext steels [] [] numDof 

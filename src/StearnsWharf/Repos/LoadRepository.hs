@@ -19,16 +19,14 @@ instance FromRow L.Load where
     fromRow = L.Load <$> field <*> field <*> field <*> field <*> field <*> field 
 
 fetchDistLoads :: Int       -- ^ System Id
-                  -> Int    -- ^ Load Case 
                   -> Connection 
                   -> IO [L.Load]
-fetchDistLoads sysId lc conn = 
+fetchDistLoads sysId conn = 
     (query conn "select oid,qy1,qy2,qx1,qx2,lf from construction.dist_loads where sys_id=?" [sysId]) :: IO [L.Load]
 
 fetchDistLoadsAsMap :: Int       -- ^ System Id
-                       -> Int    -- ^ Load Case 
                        -> Connection 
                        -> IO L.LoadMap
-fetchDistLoadsAsMap sysId lc conn = fetchDistLoads sysId lc conn >>= \loads ->
+fetchDistLoadsAsMap sysId conn = fetchDistLoads sysId conn >>= \loads ->
     return (Map.fromList (map asListItem loads))
         where asListItem x = (L.loadId x, x)
