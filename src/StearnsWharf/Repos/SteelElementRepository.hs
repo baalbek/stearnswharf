@@ -18,8 +18,8 @@ import qualified StearnsWharf.Beams as B
 import qualified StearnsWharf.Materials as M
 import qualified StearnsWharf.Steel.SteelProfiles as S
 
-data SteelElement = 
-    SteelElement {
+data SteelElementDTO = 
+    SteelElementDTO {
         elId :: Int,
         n1 :: Int,
         n2 :: Int,
@@ -27,21 +27,21 @@ data SteelElement =
         loadId :: Maybe Int } deriving Show
 
 instance FromRow S.SteelProfile where
-    fromRow = S.SteelProfile <$> field <*> field <*> field <*> field <*> field <*> field <*> field <*> liftM3 M.Steel field field field
+    fromRow = S.SteelProfile <$> field <*> field <*> field <*> field <*> field <*> field <*> field <*> field <*> liftM3 M.Steel field field field
 
-instance FromRow SteelElement where
-    fromRow = SteelElement <$> field <*> field <*> field <*> field <*> field 
+instance FromRow SteelElementDTO where
+    fromRow = SteelElementDTO <$> field <*> field <*> field <*> field <*> field 
 
 systemSteelDTO:: Int -- ^ System Id
                  -> Connection
-                 -> IO [SteelElement]
+                 -> IO [SteelElementDTO]
 systemSteelDTO sysId conn = 
-    (query conn "select oid,n1,n2,p_oid,ld_id from construction.v_steel_elements where sys_id=? order by x1,y1" [sysId]) :: IO [SteelElement]
+    (query conn "select oid,n1,n2,p_oid,ld_id from construction.v_steel_elements where sys_id=? order by x1,y1" [sysId]) :: IO [SteelElementDTO]
 
 steelElement2Beam :: N.NodeMap
                      -> L.LoadMap
                      -> S.SteelProfileMap 
-                     -> SteelElement 
+                     -> SteelElementDTO
                      -> B.Beam S.SteelProfile
 steelElement2Beam nm lm steelm el = B.Bjlk33 (elId el) n1' n2' steel ld
     where Just n1' = Map.lookup (n1 el) nm
@@ -65,7 +65,7 @@ systemSteelProfiles :: Int -- ^ System Id
                        -> IO [S.SteelProfile]
 systemSteelProfiles sysId conn = 
     (query conn 
-        "select x.oid,x.name,x.b,x.h,x.area,x.w_el_y,x.i_y,200000.0 as emodule,355.0 as sigma,251.0 as tau from construction.steel_beams x join construction.steel_elements e on e.profile_id=x.oid where e.sys_id=?" [sysId]) 
+        "select x.oid,x.name,x.b,x.h,x.flange,x.web,x.w_el_y,x.i_y,200000.0 as emodule,355.0 as sigma,251.0 as tau from construction.steel_beams x join construction.steel_elements e on e.profile_id=x.oid where e.sys_id=?" [sysId]) 
         :: IO [S.SteelProfile]
 
 systemSteelAsMap :: Int -- ^ System Id 
