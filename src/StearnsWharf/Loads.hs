@@ -1,5 +1,11 @@
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module StearnsWharf.Loads where
 
+import qualified Data.Map as Map
 import Control.Monad.ST
 
 import Data.Packed.ST (STVector,modifyVector)
@@ -7,12 +13,13 @@ import Data.Packed.ST (STVector,modifyVector)
 import StearnsWharf.Nodes (Node,systemIndexX,systemIndexY)
 import StearnsWharf.Common (radians)
 
-type LoadId = String
+type LoadId = Int
 
 data LoadVariant = WoFact | WithFact deriving (Show,Eq)
 
 data Load = 
-    Load {  qy1 :: Double,
+    Load {  loadId :: LoadId, 
+            qy1 :: Double,
             qy2 :: Double,
             qx1 :: Double,
             qx2 :: Double,
@@ -20,20 +27,24 @@ data Load =
     | MultiLoad {
         loads :: [Load]
     }
-            deriving Show
+    deriving Show
 
-data PointLoad = PointLoad { 
-                             plVal :: Double,
-                             node :: Node,
-                             plAngle :: Double,
-                             plFactor :: Double }
-            deriving Show
+type LoadMap = Map.Map Int Load
+
+data PointLoad = 
+    PointLoad { ploadId :: LoadId, 
+        plVal :: Double,
+        node :: Node,
+        plAngle :: Double,
+        plFactor :: Double }
+    deriving Show
 
 pointLoadForce :: (Double -> Double) -> LoadVariant -> PointLoad -> Double
-pointLoadForce projFun loadVar (PointLoad a _ b f) = case loadVar of WoFact -> result
-                                                                     WithFact -> result / f
-    where yproj = projFun $ radians b   
-          result = a * yproj 
+pointLoadForce projFun loadVar PointLoad { plVal,plAngle,plFactor } = 
+    case loadVar of WoFact -> result
+                    WithFact -> result / plFactor
+    where yproj = projFun $ radians plAngle
+          result = plVal * yproj 
 
 yForce :: LoadVariant -> PointLoad -> Double
 yForce = pointLoadForce sin
@@ -42,10 +53,10 @@ xForce :: LoadVariant -> PointLoad -> Double
 xForce = pointLoadForce cos
 
 sysX :: PointLoad -> Maybe Int
-sysX (PointLoad _ n _ _) = systemIndexX n
+sysX PointLoad { node } = systemIndexX node
 
 sysY :: PointLoad -> Maybe Int
-sysY (PointLoad _ n _ _) = systemIndexY n
+sysY PointLoad { node } = systemIndexY node
 
 add2systemPointLoads :: STVector s Double -> LoadVariant -> PointLoad -> ST s ()
 add2systemPointLoads vec loadVar load = do 
@@ -55,7 +66,7 @@ add2systemPointLoads vec loadVar load = do
                       Just xi -> modifyVector vec xi (\x -> x + (xForce loadVar load)) 
 
 cloneWithFactor :: Load -> Load
-cloneWithFactor ld = Load qy1' qy2' qx1' qx2' lf 
+cloneWithFactor ld = Load (-1) qy1' qy2' qx1' qx2' lf 
     where qy1' = (qy1 ld) / lf
           qy2' = (qy2 ld) / lf
           qx1' = (qx1 ld) / lf

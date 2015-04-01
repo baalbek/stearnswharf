@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP,NamedFieldPuns,RecordWildCards  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards #-}
 module StearnsWharf.Beams where
 
 -- #define RCS_DEBUG
@@ -11,11 +13,9 @@ import Text.Printf (printf)
 import Data.Maybe (fromJust)
 import Data.List (find)
 import Numeric.LinearAlgebra (Matrix,Vector,fromList,fromLists)
---import Data.Packed.ST (STMatrix,writeMatrix,modifyMatrix,readMatrix,runSTMatrix,STVector,writeVector)
 import Data.Packed.ST (STMatrix,modifyMatrix,STVector,modifyVector)
 import Control.Monad.ST (ST)
 
---import Numeric.Container ((<>),vecdisp,dispf)
 import Numeric.Container ((<>))
 import Data.Packed.Matrix (trans,(@@>))
 import Data.Packed.Vector ((@>),(|>)) 
@@ -25,7 +25,7 @@ import qualified StearnsWharf.Loads as L
 import qualified StearnsWharf.Materials as M
 import qualified StearnsWharf.Profiles as P
 
-type BeamId = String
+type BeamId = Int 
 
 data Beam a = Bjlk33 { 
                 beamId :: BeamId,

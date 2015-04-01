@@ -1,8 +1,13 @@
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module StearnsWharf.Nodes where
 
 import qualified Data.Map as Map
 
-type NodeId = String
+type NodeId = Int
 
 type Index = Int
 
@@ -30,7 +35,7 @@ data Node = Node {  nodeId :: NodeId,
                 } 
             deriving (Show)
 
-type NodeMap = Map.Map String Node
+type NodeMap = Map.Map Int Node
 
 instance Eq Node where
     (==) n1 n2 = (globNdx n1) == (globNdx n2)
@@ -104,4 +109,10 @@ indexSeeds n1 n2 = foldr (:) ip2 ip1
           ip2 = indexSeed d2 SecondNode $ globNdx n2 
           d1 = dof n1
           d2 = dof n2
+
+-- | Clones node clo and setting global index to gi
+clone :: Node     -- ^ Node to be cloned
+         -> Int   -- ^ Global index to be used for the clone
+         -> Node
+clone clo gi = Node (nodeId clo) (nx clo) (ny clo) (dof clo) gi
 
