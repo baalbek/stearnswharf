@@ -84,9 +84,10 @@ runStearnsWharf host dbname user sysId loadCase =
     getConnection host dbname user >>= \c ->
     NR.fetchNodesAsMap sysId c >>= \nx -> 
     LR.fetchDistLoadsAsMap sysId c >>= \lx ->
+    LR.systemPointLoads c sysId nx >>= \px ->
     SR.systemSteelElements sysId loadCase c nx lx >>= \steels ->
     let numDof = systemDof (elems nx)  
-        ctx = ProfileContext steels [] [] numDof 
+        ctx = ProfileContext steels [] px numDof 
         (rf,rd) = calcDeflections ctx 
         result = beamResults ctx rf rd in
     mapM_ OUT.printResults result >>
