@@ -25,11 +25,12 @@ data Loc2glob = Loc2glob { loc, glob :: MatrixCoord } deriving Show
                 
 data Loc2globVec = Loc2globVec { locv, globv :: Int } deriving Show
 
-data Dof = Dof { dofX, dofY, dofM :: Int } deriving (Eq,Show)
+data Dof = Dof { dofX, dofZ, dofM :: Int } deriving (Eq,Show)
 
 data Node = Node {  nodeId :: NodeId, 
                     nx :: Double, 
                     ny :: Double,
+                    nz :: Double,
                     dof :: Dof,  -- degrees of freedom
                     globNdx :: Index -- global index
                 } 
@@ -48,24 +49,26 @@ data Geom = Geom { c :: Double, s :: Double, len :: Double } deriving Show
 calcGeom :: Node -> Node -> Geom
 calcGeom n1 n2 = Geom { c = xcos, 
                         s = xsin,
-                        len =  xlen }
+                        len =  zlen }
             where xDelta = (nx n2) - (nx n1) 
                   yDelta = (ny n2) - (ny n1) 
-                  xlen = sqrt (yDelta**2.0 + xDelta**2.0)
-                  xcos = xDelta / xlen  
-                  xsin = yDelta / xlen  
+                  zDelta = (nz n2) - (nz n1) 
+                  zlen = sqrt (xDelta**2.0 + yDelta**2.0 + zDelta**2.0)
+                  xlen = sqrt (xDelta**2.0 + yDelta**2.0)
+                  xcos = xlen / zlen  
+                  xsin = zDelta / xlen  
 
 systemIndexX :: Node -> Maybe Int
-systemIndexX (Node _ _ _ (Dof x' _ _) gi) | x' == 0 = Nothing
+systemIndexX (Node _ _ _ _ (Dof x' _ _) gi) | x' == 0 = Nothing
                                           | otherwise = Just gi
 
 systemIndexY :: Node -> Maybe Int
-systemIndexY (Node _ _ _ (Dof x' y' _) gi) | y' == 0 = Nothing
+systemIndexY (Node _ _ _ _ (Dof x' y' _) gi) | y' == 0 = Nothing
                                            | x' == 0 = Just gi 
                                            | otherwise = Just $ gi + 1
 
 numDof :: Dof -> Int
-numDof d = (dofX d) + (dofY d) + (dofM d) 
+numDof d = (dofX d) + (dofZ d) + (dofM d) 
 
 l2gMx :: IndexPair -> IndexPair -> Loc2glob
 l2gMx a b = Loc2glob co1 co2 
@@ -100,7 +103,7 @@ indexSeed d nodeType globalIndex = case bs of
           startIndex | nodeType == FirstNode = 0
                      | otherwise = 3                  
           globalIndexY = globalIndex + (dofX d)
-          globalIndexM = globalIndexY + (dofY d)
+          globalIndexM = globalIndexY + (dofZ d)
 
 
 indexSeeds :: Node -> Node -> [IndexPair]
@@ -114,5 +117,5 @@ indexSeeds n1 n2 = foldr (:) ip2 ip1
 clone :: Node     -- ^ Node to be cloned
          -> Int   -- ^ Global index to be used for the clone
          -> Node
-clone clo gi = Node (nodeId clo) (nx clo) (ny clo) (dof clo) gi
+clone clo gi = Node (nodeId clo) (nx clo) (ny clo) (nz clo) (dof clo) gi
 

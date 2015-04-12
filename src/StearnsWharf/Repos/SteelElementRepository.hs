@@ -33,11 +33,11 @@ instance FromRow S.SteelProfile where
 instance FromRow SteelElementDTO where
     fromRow = SteelElementDTO <$> field <*> field <*> field <*> field <*> field 
 
-systemSteelDTO:: Int -- ^ System Id
+systemSteelDTO:: Connection 
+                 -> Int    -- ^ System Id
                  -> Int    -- ^ Load Case 
-                 -> Connection
                  -> IO [SteelElementDTO]
-systemSteelDTO sysId lc conn = 
+systemSteelDTO conn sysId lc = 
     (query conn "select oid,n1,n2,p_oid,ld_id from construction.v_steel_elements where sys_id=? and ((ld_case=?) or (ld_id is null)) order by x1,y1" [sysId,lc]) :: IO [SteelElementDTO]
 
 
@@ -52,31 +52,31 @@ steelElement2Beam nm lm steelm el = B.Bjlk33 (elId el) n1' n2' steel ld
           Just steel = Map.lookup (profileId el) steelm
           ld = loadId el >>= flip Map.lookup lm
 
-systemSteelElements :: Int -- ^ System Id
+systemSteelElements :: Connection
+                       -> Int    -- ^ System Id
                        -> Int    -- ^ Load Case 
-                       -> Connection
                        -> N.NodeMap
                        -> L.LoadMap
                        -> IO [B.Beam S.SteelProfile]
-systemSteelElements sysId lc conn nm lm = 
-    systemSteelDTO sysId lc conn >>= \dto ->
-    systemSteelAsMap sysId conn >>= \steelm ->
+systemSteelElements conn sysId lc nm lm = 
+    systemSteelDTO conn sysId lc >>= \dto ->
+    systemSteelAsMap conn sysId >>= \steelm ->
     let steelElement2Beam' = steelElement2Beam nm lm steelm in 
     return (map steelElement2Beam' dto)
 
-systemSteelProfiles :: Int -- ^ System Id 
-                       -> Connection
+systemSteelProfiles :: Connection
+                       -> Int     -- ^ System Id 
                        -> IO [S.SteelProfile]
-systemSteelProfiles sysId conn = 
+systemSteelProfiles conn sysId = 
     (query conn 
         "select x.oid,x.name,x.b,x.h,x.flange,x.web,x.w_el_y,x.i_y,200000.0 as emodule,355.0 as sigma,251.0 as tau from construction.steel_beams x join construction.steel_elements e on e.profile_id=x.oid where e.sys_id=?" [sysId]) 
         :: IO [S.SteelProfile]
 
-systemSteelAsMap :: Int -- ^ System Id 
-                    -> Connection
+systemSteelAsMap :: Connection 
+                    -> Int -- ^ System Id 
                     -> IO S.SteelProfileMap 
-systemSteelAsMap sysId conn = 
-    systemSteelProfiles sysId conn >>= \profiles ->
+systemSteelAsMap conn sysId = 
+    systemSteelProfiles conn sysId >>= \profiles ->
     return (Map.fromList (map asListItem profiles))
         where asListItem x = (S.profileId x, x)
 

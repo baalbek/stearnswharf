@@ -28,16 +28,16 @@ instance FromRow PointLoadDTO where
 instance FromRow L.Load where
     fromRow = L.Load <$> field <*> field <*> field <*> field <*> field <*> field 
 
-fetchDistLoads :: Int       -- ^ System Id
-                  -> Connection 
+fetchDistLoads :: Connection 
+                  -> Int     -- ^ System Id  
                   -> IO [L.Load]
-fetchDistLoads sysId conn = 
-    (query conn "select oid,qy1,qy2,qx1,qx2,lf from construction.dist_loads where sys_id=?" [sysId]) :: IO [L.Load]
+fetchDistLoads conn sysId = 
+    (query conn "select oid,qz1,qz2,qx1,qx2,lf from construction.dist_loads where sys_id=?" [sysId]) :: IO [L.Load]
 
-fetchDistLoadsAsMap :: Int       -- ^ System Id
-                       -> Connection 
+fetchDistLoadsAsMap :: Connection 
+                       -> Int       -- ^ System Id
                        -> IO L.LoadMap
-fetchDistLoadsAsMap sysId conn = fetchDistLoads sysId conn >>= \loads ->
+fetchDistLoadsAsMap conn sysId = fetchDistLoads conn sysId >>= \loads ->
     return (Map.fromList (map asListItem loads))
         where asListItem x = (L.loadId x, x)
 

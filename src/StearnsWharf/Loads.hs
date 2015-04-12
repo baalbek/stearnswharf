@@ -19,8 +19,8 @@ data LoadVariant = WoFact | WithFact deriving (Show,Eq)
 
 data Load = 
     Load {  loadId :: LoadId, 
-            qy1 :: Double,
-            qy2 :: Double,
+            qz1 :: Double,
+            qz2 :: Double,
             qx1 :: Double,
             qx2 :: Double,
             loadFactor :: Double } 
@@ -66,9 +66,9 @@ add2systemPointLoads vec loadVar load = do
                       Just xi -> modifyVector vec xi (\x -> x + (xForce loadVar load)) 
 
 cloneWithFactor :: Load -> Load
-cloneWithFactor ld = Load (-1) qy1' qy2' qx1' qx2' lf 
-    where qy1' = (qy1 ld) / lf
-          qy2' = (qy2 ld) / lf
+cloneWithFactor ld = Load (-1) qz1' qz2' qx1' qx2' lf 
+    where qz1' = (qz1 ld) / lf
+          qz2' = (qz2 ld) / lf
           qx1' = (qx1 ld) / lf
           qx2' = (qx2 ld) / lf
           lf   = loadFactor ld

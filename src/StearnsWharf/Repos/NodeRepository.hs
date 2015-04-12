@@ -20,13 +20,13 @@ import qualified StearnsWharf.Nodes as N
 type NodeDef = (Int,N.Node)
 
 instance FromRow N.Node where
-    fromRow = N.Node <$> field <*> field <*> field <*> liftM3 N.Dof field field field <*> field
+    fromRow = N.Node <$> field <*> field <*> field <*> field <*> liftM3 N.Dof field field field <*> field
 
-fetchNodes :: Int           -- ^ System Id
-              -> Connection 
+fetchNodes :: Connection 
+              -> Int           -- ^ System Id 
               -> IO [N.Node]
-fetchNodes sysId conn = 
-    (query conn "select oid,x,y,dofx,dofy,dofm,0 from construction.nodes where sys_id=?" [sysId]) :: IO [N.Node]
+fetchNodes conn sysId = 
+    (query conn "select n.oid,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.systems s on s.project_id=n.project_id and s.coord_sys=n.coord_sys where s.oid=?" [sysId]) :: IO [N.Node]
 
 matstatNodeDef :: N.Node -> State Int NodeDef
 matstatNodeDef node = 
@@ -39,9 +39,9 @@ linkNodes [] _ = []
 linkNodes (x:xs) j = fst rs : linkNodes xs (snd rs)
     where rs = runState (matstatNodeDef x) j
 
-fetchNodesAsMap :: Int  -- ^ System Id
-                   -> Connection 
+fetchNodesAsMap :: Connection 
+                   -> Int           -- ^ System id 
                    -> IO N.NodeMap
-fetchNodesAsMap sysId conn = fetchNodes sysId conn >>= \nodes ->
+fetchNodesAsMap conn sysId = fetchNodes conn sysId >>= \nodes ->
     return (Map.fromList (linkNodes nodes 0))
     

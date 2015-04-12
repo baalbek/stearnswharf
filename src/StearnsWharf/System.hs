@@ -35,11 +35,11 @@ systemDof :: [N.Node] -> Int
 systemDof nodes = (N.globNdx maxNode) + (N.numDof . N.dof) maxNode
     where maxNode = maximum nodes
 
-systemSY :: ProfileContext -> L.LoadVariant -> Vector Double
-systemSY ProfileContext { steelProfiles,woodProfiles,numDof } loadVar = runSTVector $ do
+systemSZ :: ProfileContext -> L.LoadVariant -> Vector Double
+systemSZ ProfileContext { steelProfiles,woodProfiles,numDof } loadVar = runSTVector $ do
     v <- newVector 0.0 numDof 
-    mapM_ (\x -> B.add2systemSY v loadVar x) steelProfiles
-    mapM_ (\x -> B.add2systemSY v loadVar x) woodProfiles
+    mapM_ (\x -> B.add2systemSZ v loadVar x) steelProfiles
+    mapM_ (\x -> B.add2systemSZ v loadVar x) woodProfiles
     return v
 
 systemPointLoads :: [L.PointLoad] -> Int -> L.LoadVariant -> Vector Double
@@ -59,8 +59,8 @@ systemK ProfileContext { steelProfiles,woodProfiles,numDof } = runSTMatrix $ do
 calcDeflections :: ProfileContext -> (Vector Double, Vector Double) 
 calcDeflections ctx@ProfileContext { pointLoads,numDof } = (resultForces,resultDeflections)
     where invSysK = inv $ systemK ctx 
-          sysSyWo = systemSY ctx L.WoFact 
-          sysSyWith = systemSY ctx L.WithFact
+          sysSyWo = systemSZ ctx L.WoFact 
+          sysSyWith = systemSZ ctx L.WithFact
           sysPwo = systemPointLoads pointLoads numDof L.WoFact 
           sysPwith = systemPointLoads pointLoads numDof L.WithFact 
           resultForces = invSysK <> (sysSyWo + sysPwo)
@@ -82,10 +82,11 @@ runStearnsWharf :: String    -- ^ Database Host
                    -> IO ()
 runStearnsWharf host dbname user sysId loadCase = 
     getConnection host dbname user >>= \c ->
-    NR.fetchNodesAsMap sysId c >>= \nx -> 
-    LR.fetchDistLoadsAsMap sysId c >>= \lx ->
+    getConnection host "engineer" "engineer" >>= \c ->
+    NR.fetchNodesAsMap c sysId >>= \nx -> 
+    LR.fetchDistLoadsAsMap c sysId >>= \lx ->
     LR.systemPointLoads c sysId nx >>= \px ->
-    SR.systemSteelElements sysId loadCase c nx lx >>= \steels ->
+    SR.systemSteelElements c sysId loadCase nx lx >>= \steels ->
     let numDof = systemDof (elems nx)  
         ctx = ProfileContext steels [] px numDof 
         (rf,rd) = calcDeflections ctx 
