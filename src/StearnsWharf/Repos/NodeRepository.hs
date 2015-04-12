@@ -25,18 +25,17 @@ type NodeDef = (Int,N.Node)
 instance FromRow N.Node where
     fromRow = N.Node <$> field <*> field <*> field <*> field <*> liftM3 N.Dof field field field <*> field
 
-sql :: Query
-sql = Query (UTF8.fromString (printf "%s %s %s %s" s1 s2 s3 s4 :: String))
-    where s1 = "select n.oid,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n"
-          s2 = "where n.oid in (select n1 from construction.steel_elements where sys_id=?)"
-          s3 = "or n.oid in (select n2 from construction.steel_elements where sys_id=?)"
-          s4 = "order by n.x,n.y"
-
 {-
     where s1 = "select n.oid,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n"
           s2 = "join construction.systems s on s.project_id=n.project_id and s.coord_sys=n.coord_sys"
           s3 = "where s.oid=? order by n.x,n.y " 
 -}
+
+sql :: Query
+sql = Query (UTF8.fromString (printf "%s union %s order by 2,3" s1 s2 :: String))
+    where s1 = "select n.oid,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.steel_elements e on n.oid=e.n1 where e.sys_id=?"
+          s2 = "select n.oid,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.steel_elements e on n.oid=e.n2 where e.sys_id=?"
+
 
 fetchNodes :: Connection 
               -> Int           -- ^ System Id 
