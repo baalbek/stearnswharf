@@ -22,6 +22,7 @@ data NodeResult = NodeResult {
 
 data BeamResult = BeamResult { brId :: B.BeamId, 
                                desc :: String,
+                               nodeSpan :: Double,
                                nr1 :: NodeResult,
                                nr2 :: NodeResult } deriving Show
 
@@ -41,7 +42,7 @@ xTrans :: NodeResult -> Double
 xTrans nr = (displacements nr) @> 0
 
 collectResult :: P.Profile a => Vector Double -> Vector Double -> B.Beam a -> BeamResult
-collectResult vForces vDeflect beam = BeamResult (B.beamId beam) (P.desc $ B.bt beam) nr1 nr2
+collectResult vForces vDeflect beam = BeamResult (B.beamId beam) (P.desc $ B.bt beam) (N.len geom) nr1 nr2
     where locV = B.localDisps beam vDeflect 
           locF = B.localForces beam $ B.localDisps beam vForces
           nodeV i = (subVector i 3 locV) 
@@ -49,6 +50,7 @@ collectResult vForces vDeflect beam = BeamResult (B.beamId beam) (P.desc $ B.bt 
           (stress1,stress2) = B.localStresses beam locF
           curN1 = B.n1 beam
           curN2 = B.n2 beam
+          geom = N.calcGeom curN2 curN1
           nr1 = NodeResult (N.nodeId curN1) (N.desc curN1) (nodeF 0) (nodeV 0) stress1
           nr2 = NodeResult (N.nodeId curN2) (N.desc curN2) (nodeF 3) (nodeV 3) stress2
             
@@ -79,8 +81,8 @@ printNodeResults nr = do
 
 
 printResults :: BeamResult -> IO ()
-printResults BeamResult { brId,desc,nr1,nr2 } = do 
-    printf "Beam: %s [%d]\n" desc brId
+printResults BeamResult { brId,desc,nodeSpan,nr1,nr2 } = do 
+    printf "Beam: %s [%d], span: %.2f m\n" desc brId nodeSpan 
     printNodeResults $ nr1
     printNodeResults $ nr2
 
