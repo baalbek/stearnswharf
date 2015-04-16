@@ -28,6 +28,7 @@ data Loc2globVec = Loc2globVec { locv, globv :: Int } deriving Show
 data Dof = Dof { dofX, dofZ, dofM :: Int } deriving (Eq,Show)
 
 data Node = Node {  nodeId :: NodeId, 
+                    desc :: String, 
                     nx :: Double, 
                     ny :: Double,
                     nz :: Double,
@@ -59,11 +60,11 @@ calcGeom n1 n2 = Geom { c = xcos,
                   xsin = zDelta / xlen  
 
 systemIndexX :: Node -> Maybe Int
-systemIndexX (Node _ _ _ _ (Dof x' _ _) gi) | x' == 0 = Nothing
+systemIndexX (Node _ _ _ _ _ (Dof x' _ _) gi) | x' == 0 = Nothing
                                           | otherwise = Just gi
 
 systemIndexY :: Node -> Maybe Int
-systemIndexY (Node _ _ _ _ (Dof x' y' _) gi) | y' == 0 = Nothing
+systemIndexY (Node _ _ _ _ _ (Dof x' y' _) gi) | y' == 0 = Nothing
                                            | x' == 0 = Just gi 
                                            | otherwise = Just $ gi + 1
 
@@ -117,5 +118,5 @@ indexSeeds n1 n2 = foldr (:) ip2 ip1
 clone :: Node     -- ^ Node to be cloned
          -> Int   -- ^ Global index to be used for the clone
          -> Node
-clone clo gi = Node (nodeId clo) (nx clo) (ny clo) (nz clo) (dof clo) gi
+clone clo gi = Node (nodeId clo) (desc clo) (nx clo) (ny clo) (nz clo) (dof clo) gi
 

@@ -13,6 +13,7 @@ import qualified StearnsWharf.Profiles as P
 
 data NodeResult = NodeResult {
                     nrId :: N.NodeId,
+                    nrDesc :: String,
                     forces :: Vector Double,
                     displacements :: Vector Double,
                     stresses :: M.Stress 
@@ -46,8 +47,11 @@ collectResult vForces vDeflect beam = BeamResult (B.beamId beam) (P.desc $ B.bt 
           nodeV i = (subVector i 3 locV) 
           nodeF i = (subVector i 3 locF) 
           (stress1,stress2) = B.localStresses beam locF
-          nr1 = NodeResult (N.nodeId (B.n1 beam)) (nodeF 0) (nodeV 0) stress1
-          nr2 = NodeResult (N.nodeId (B.n2 beam)) (nodeF 3) (nodeV 3) stress2
+          curN1 = B.n1 beam
+          curN2 = B.n2 beam
+          nr1 = NodeResult (N.nodeId curN1) (N.desc curN1) (nodeF 0) (nodeV 0) stress1
+          nr2 = NodeResult (N.nodeId curN2) (N.desc curN2) (nodeF 3) (nodeV 3) stress2
+            
 
 collectNodes :: [BeamResult] -> [NodeResult]
 collectNodes [] = []
@@ -64,7 +68,7 @@ maxProperty maxFun (x:xs)
 
 printNodeResults :: NodeResult -> IO ()
 printNodeResults nr = do
-    printf "\tNode: [%d]\n" $ nrId nr
+    printf "\tNode %s: [%d]\n" (nrDesc nr) (nrId nr)
     printf "\t\tNormal: %.2f kN\n" $ normalf nr
     printf "\t\tShear: %.2f kN\n" $ shear nr 
     printf "\t\tMoment: %.2f kNm\n" $ moment nr
