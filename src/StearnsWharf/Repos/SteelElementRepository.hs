@@ -10,7 +10,6 @@ import Control.Monad (liftM3)
 import Control.Applicative ((<$>),(<*>))
 import Database.PostgreSQL.Simple (Connection,query)
 import Database.PostgreSQL.Simple.FromRow (FromRow,fromRow,field)
-import Database.PostgreSQL.Simple.Types (Only(..),In(..))
 
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L

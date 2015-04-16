@@ -1,9 +1,7 @@
 {-# LANGUAGE FlexibleInstances,MultiParamTypeClasses,DeriveDataTypeable #-}
 -- #define RCS_DEMO
 
-import GHC.Float (float2Double)
 import System.Console.CmdLib -- (Attributes,Group,Help,ArgHelp,Default,RecordCommand)
-import Text.Printf (printf)
 
 import StearnsWharf.System (runStearnsWharf)
 

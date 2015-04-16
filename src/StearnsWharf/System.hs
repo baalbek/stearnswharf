@@ -82,7 +82,7 @@ runStearnsWharf :: String    -- ^ Database Host
                    -> IO ()
 runStearnsWharf host dbname user sysId loadCase = 
     getConnection host dbname user >>= \c ->
-    getConnection host "engineer" "engineer" >>= \c ->
+    -- getConnection host "engineer" "engineer" >>= \c ->
     NR.fetchNodesAsMap c sysId >>= \nx -> 
     LR.fetchDistLoadsAsMap c sysId >>= \lx ->
     LR.systemPointLoads c sysId nx >>= \px ->
