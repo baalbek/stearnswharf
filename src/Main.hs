@@ -16,7 +16,7 @@ data Main = Main {
 
 instance Attributes Main where
     attributes _ = group "Options" [
-            h      %> [ Group "Database", Help "Database host", Default "xochitecatl" ] ,
+            h      %> [ Group "Database", Help "Database host", Default "xochitecatl2" ] ,
             db     %> [ Group "Database", Help "Database name", Default "engineer" ] ,
             u      %> [ Group "Database", Help "Database user", Default "engineer" ] ,
             s      %> [ Group "System", Positional 0, Required True ] ,

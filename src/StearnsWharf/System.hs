@@ -16,6 +16,7 @@ import StearnsWharf.Common (getConnection)
 import qualified StearnsWharf.Repos.NodeRepository as NR
 import qualified StearnsWharf.Repos.LoadRepository as LR
 import qualified StearnsWharf.Repos.SteelElementRepository as SR
+import qualified StearnsWharf.Repos.WoodElementRepository as WR
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L
 import qualified StearnsWharf.Beams as B
@@ -87,8 +88,9 @@ runStearnsWharf host dbname user sysId loadCase =
     LR.fetchDistLoadsAsMap c sysId >>= \lx ->
     LR.systemPointLoads c sysId nx >>= \px ->
     SR.systemSteelElements c sysId loadCase nx lx >>= \steels ->
+    WR.systemWoodElements c sysId nx lx >>= \woods ->
     let numDof = systemDof (elems nx)  
-        ctx = ProfileContext steels [] px numDof 
+        ctx = ProfileContext steels woods px numDof 
         (rf,rd) = calcDeflections ctx 
         result = beamResults ctx rf rd in
     mapM_ OUT.printResults result >>

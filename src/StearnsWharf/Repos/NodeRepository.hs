@@ -32,16 +32,18 @@ instance FromRow N.Node where
 -}
 
 sql :: Query
-sql = Query (UTF8.fromString (printf "%s union %s order by 2,3" s1 s2 :: String))
+sql = Query (UTF8.fromString (printf "%s union %s union %s union %s order by 2,3" s1 s2 w1 w2 :: String))
     where s1 = "select n.oid,dsc,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.steel_elements e on n.oid=e.n1 where e.sys_id=?"
           s2 = "select n.oid,dsc,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.steel_elements e on n.oid=e.n2 where e.sys_id=?"
+          w1 = "select n.oid,dsc,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.wood_elements e on n.oid=e.n1 where e.sys_id=?"
+          w2 = "select n.oid,dsc,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.wood_elements e on n.oid=e.n2 where e.sys_id=?"
 
 
 fetchNodes :: Connection 
               -> Int           -- ^ System Id 
               -> IO [N.Node]
 fetchNodes conn sysId = 
-    (query conn sql [sysId,sysId]) :: IO [N.Node]
+    (query conn sql [sysId,sysId,sysId,sysId]) :: IO [N.Node]
 
 matstatNodeDef :: N.Node -> State Int NodeDef
 matstatNodeDef node = 
