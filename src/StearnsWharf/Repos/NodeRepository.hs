@@ -16,7 +16,6 @@ import Database.PostgreSQL.Simple (Connection,query)
 import Database.PostgreSQL.Simple.Types (Query(..))
 import Database.PostgreSQL.Simple.FromRow (FromRow,fromRow,field)
 
-import StearnsWharf.Common (getConnection)
 import qualified StearnsWharf.Nodes as N
 
 
@@ -25,14 +24,8 @@ type NodeDef = (Int,N.Node)
 instance FromRow N.Node where
     fromRow = N.Node <$> field <*> field <*> field <*> field <*> field <*> liftM3 N.Dof field field field <*> field
 
-{-
-    where s1 = "select n.oid,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n"
-          s2 = "join construction.systems s on s.project_id=n.project_id and s.coord_sys=n.coord_sys"
-          s3 = "where s.oid=? order by n.x,n.y " 
--}
-
 sql :: Query
-sql = Query (UTF8.fromString (printf "%s union %s union %s union %s order by 2,3" s1 s2 w1 w2 :: String))
+sql = Query (UTF8.fromString (printf "%s union %s union %s union %s order by 3,4" s1 s2 w1 w2 :: String))
     where s1 = "select n.oid,dsc,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.steel_elements e on n.oid=e.n1 where e.sys_id=?"
           s2 = "select n.oid,dsc,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.steel_elements e on n.oid=e.n2 where e.sys_id=?"
           w1 = "select n.oid,dsc,n.x,n.y,n.z,n.dofx,n.dofz,n.dofm,0 from construction.nodes n join construction.wood_elements e on n.oid=e.n1 where e.sys_id=?"

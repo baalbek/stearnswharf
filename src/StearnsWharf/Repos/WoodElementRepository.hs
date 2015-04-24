@@ -17,12 +17,6 @@ import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L
 import qualified StearnsWharf.Beams as B
 
-{-
-data WoodElementDTO = 
-    WoodElementDTO {
-    } deriving Show
--}
-
 data WoodProfileDTO = 
         WoodProfileDTO {
             elId :: Int,

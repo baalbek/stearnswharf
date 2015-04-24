@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP,NamedFieldPuns,RecordWildCards #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards #-}
 module StearnsWharf.System where
 
 -- #define RCS_DEBUG
@@ -30,7 +32,8 @@ data ProfileContext = ProfileContext {
                             woodProfiles :: [B.Beam WP.WoodProfile],
                             pointLoads :: [L.PointLoad],
                             numDof :: Int
-                        }
+                        } 
+                        deriving Show
 
 systemDof :: [N.Node] -> Int
 systemDof nodes = (N.globNdx maxNode) + (N.numDof . N.dof) maxNode
@@ -82,19 +85,27 @@ runStearnsWharf :: String    -- ^ Database Host
                    -> Int    -- ^ Load Case
                    -> IO ()
 runStearnsWharf host dbname user sysId loadCase = 
+    getProfileContext host dbname user sysId loadCase >>= \ctx ->
+    let (rf,rd) = calcDeflections ctx 
+        result = beamResults ctx rf rd in
+    mapM_ OUT.printResults result >>
+    OUT.printSummary result >> 
+    return ()
+
+getProfileContext :: String    -- ^ Database Host  
+                     -> String -- ^ Database Name
+                     -> String -- ^ Database User 
+                     -> Int    -- ^ System Id
+                     -> Int    -- ^ Load Case
+                     -> IO ProfileContext 
+getProfileContext host dbname user sysId loadCase = 
     getConnection host dbname user >>= \c ->
-    -- getConnection host "engineer" "engineer" >>= \c ->
     NR.fetchNodesAsMap c sysId >>= \nx -> 
     LR.fetchDistLoadsAsMap c sysId >>= \lx ->
     LR.systemPointLoads c sysId nx >>= \px ->
     SR.systemSteelElements c sysId loadCase nx lx >>= \steels ->
     WR.systemWoodElements c sysId nx lx >>= \woods ->
     let numDof = systemDof (elems nx)  
-        ctx = ProfileContext steels woods px numDof 
-        (rf,rd) = calcDeflections ctx 
-        result = beamResults ctx rf rd in
-    mapM_ OUT.printResults result >>
-    OUT.printSummary result >> 
+        ctx = ProfileContext steels woods px numDof in 
     close c >> 
-    return ()
-
+    return ctx

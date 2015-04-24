@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                stearnswharf
-version:             2.1
+version:             2.2
 -- synopsis:            
 -- description:         
 -- license:             
@@ -14,7 +14,7 @@ category:            Structural Engineering
 build-type:          Simple
 cabal-version:       >=1.8
 
-executable stearnswharf-2.1
+executable stearnswharf-2.2
   main-is: Main.hs 
   -- main-is:             
   -- other-modules:       
