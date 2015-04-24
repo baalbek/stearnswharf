@@ -3,9 +3,12 @@ module StearnsWharf.Output where
 
 import Text.Printf (printf)
 
+import Control.Monad (mplus)
+
 import Numeric.LinearAlgebra (Vector)
 import Data.Packed.Vector ((@>),subVector) 
 
+import qualified StearnsWharf.Loads as L
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Beams as B
 import qualified StearnsWharf.Materials as M
@@ -16,15 +19,19 @@ data NodeResult = NodeResult {
                     nrDesc :: String,
                     forces :: Vector Double,
                     displacements :: Vector Double,
-                    stresses :: M.Stress 
+                    stresses :: M.Stress
                 } 
                 deriving Show
 
-data BeamResult = BeamResult { brId :: B.BeamId, 
-                               desc :: String,
-                               nodeSpan :: Double,
-                               nr1 :: NodeResult,
-                               nr2 :: NodeResult } deriving Show
+data BeamResult = 
+    BeamResult {
+        brId :: B.BeamId, 
+        desc :: String,
+        nodeSpan :: Double,
+        nr1 :: NodeResult,
+        nr2 :: NodeResult,
+        load :: Maybe L.Load
+    } deriving Show
 
 shear :: NodeResult -> Double
 shear nr = (forces nr) @> 1
@@ -42,7 +49,7 @@ xTrans :: NodeResult -> Double
 xTrans nr = (displacements nr) @> 0
 
 collectResult :: P.Profile a => Vector Double -> Vector Double -> B.Beam a -> BeamResult
-collectResult vForces vDeflect beam = BeamResult (B.beamId beam) (P.desc $ B.bt beam) (N.len geom) nr1 nr2
+collectResult vForces vDeflect beam = BeamResult (B.beamId beam) (P.desc $ B.bt beam) (N.len geom) nr1 nr2 (B.ld beam)
     where locV = B.localDisps beam vDeflect 
           locF = B.localForces beam $ B.localDisps beam vForces
           nodeV i = (subVector i 3 locV) 
@@ -79,10 +86,15 @@ printNodeResults nr = do
     printf "\t\tSigma : %.2f N/mm2\n" $ M.sigma $ stresses nr
     printf "\t\tTau : %.2f N/mm2\n" $ M.tau $ stresses nr
 
+maybeLoadToString :: Maybe L.Load -> String
+maybeLoadToString ld = ldStr 
+    where ldStr = case ld of 
+                    Just ld' -> show ld' 
+                    Nothing -> "Load: -"
 
 printResults :: BeamResult -> IO ()
-printResults BeamResult { brId,desc,nodeSpan,nr1,nr2 } = do 
-    printf "Beam: %s [%d], span: %.2f m\n" desc brId nodeSpan 
+printResults BeamResult { brId,desc,nodeSpan,nr1,nr2,load } = do 
+    printf "Beam: %s [%d], span: %.2f m\n%s\n" desc brId nodeSpan (maybeLoadToString load) 
     printNodeResults $ nr1
     printNodeResults $ nr2
 

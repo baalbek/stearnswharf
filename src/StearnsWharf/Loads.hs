@@ -5,6 +5,8 @@
 
 module StearnsWharf.Loads where
 
+import Text.Printf (printf)
+
 import qualified Data.Map as Map
 import Control.Monad.ST
 
@@ -27,7 +29,11 @@ data Load =
     | MultiLoad {
         loads :: [Load]
     }
-    deriving Show
+    -- deriving Show
+
+instance Show Load where
+    show Load { loadId,qz1,qz2,loadFactor } = printf "Load: [%d] qz1: %.2f, qz2: %.2f, lf: %.2f" loadId qz1 qz2 loadFactor
+
 
 type LoadMap = Map.Map Int Load
 
