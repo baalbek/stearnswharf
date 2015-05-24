@@ -90,6 +90,7 @@ runStearnsWharf host dbname user sysId loadCase =
         result = beamResults ctx rf rd in
     mapM_ OUT.printResults result >>
     OUT.printSummary result >> 
+    OUT.printNodeLoads (pointLoads ctx) >>
     return ()
 
 getProfileContext :: String    -- ^ Database Host  

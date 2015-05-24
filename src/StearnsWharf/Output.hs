@@ -100,7 +100,7 @@ printResults BeamResult { brId,desc,nodeSpan,nr1,nr2,load } = do
 
 printSummary :: [BeamResult] -> IO ()
 printSummary brs = do
-    putStrLn "******************* Summary ************************"
+    putStrLn "\n******************* Summary ************************"
     let nodes = collectNodes brs
     let maxM = maxProperty moment nodes
     let maxS = maxProperty shear nodes
@@ -109,3 +109,20 @@ printSummary brs = do
     printf "Max shear [%d]: %.2f kN\n" (nrId maxS) (shear maxS)
     printf "Max deflection [%d]: %.2f mm\n" (nrId maxV) (1000.0 * (yTrans maxV))
 
+{-
+    PointLoad { ploadId :: LoadId, 
+        plVal :: Double,
+        node :: Node,
+        plAngle :: Double,
+        plFactor :: Double }
+ -}
+
+printNodeLoad :: L.PointLoad -> IO ()
+printNodeLoad L.PointLoad { ploadId,plVal,node,plAngle,plFactor } = 
+    printf "Node load [%d] node: %s, value: %.1f\n" ploadId (N.desc node) plVal
+
+printNodeLoads :: [L.PointLoad] -> IO ()
+printNodeLoads plx = 
+    putStrLn "\n******************* Node Loads ************************" >>
+    mapM_ printNodeLoad plx
+                            
