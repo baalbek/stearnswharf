@@ -89,8 +89,8 @@ runStearnsWharf host dbname user sysId loadCase =
     let (rf,rd) = calcDeflections ctx 
         result = beamResults ctx rf rd in
     mapM_ OUT.printResults result >>
-    OUT.printSummary result >> 
     OUT.printNodeLoads (pointLoads ctx) >>
+    OUT.printSummary result >> 
     return ()
 
 getProfileContext :: String    -- ^ Database Host  

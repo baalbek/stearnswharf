@@ -107,7 +107,7 @@ printSummary brs = do
     let maxV = maxProperty yTrans nodes
     printf "Max moment [%d]: %.2f kNm\n" (nrId maxM) (moment maxM)
     printf "Max shear [%d]: %.2f kN\n" (nrId maxS) (shear maxS)
-    printf "Max deflection [%d]: %.2f mm\n" (nrId maxV) (1000.0 * (yTrans maxV))
+    printf "Max deflection [%d]: %.2f mm\n\n" (nrId maxV) (1000.0 * (yTrans maxV))
 
 {-
     PointLoad { ploadId :: LoadId, 
