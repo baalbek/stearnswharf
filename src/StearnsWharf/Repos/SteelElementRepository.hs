@@ -37,7 +37,7 @@ systemSteelDTO:: Connection
                  -> Int    -- ^ Load Case 
                  -> IO [SteelElementDTO]
 systemSteelDTO conn sysId lc = 
-    (query conn "select oid,n1,n2,p_oid,ld_id from construction.v_steel_elements where sys_id=? and ((ld_case=?) or (ld_id is null)) order by x1,y1" [sysId,lc]) :: IO [SteelElementDTO]
+    (query conn "select oid,n1,n2,profile_id,ld_id from construction.v_steel_elements where sys_id=? and ((ld_case=?) or (ld_id is null)) order by x1,y1" [sysId,lc]) :: IO [SteelElementDTO]
 
 
 steelElement2Beam :: N.NodeMap
