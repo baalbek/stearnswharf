@@ -79,23 +79,6 @@ beamResults ProfileContext { steelProfiles,woodProfiles } vUltimateLimit vServic
                        | otherwise = map (OUT.collectResult vUltimateLimit vServicabilityLimit) steelProfiles 
 
 
-{-
-xrunStearnsWharf :: String    -- ^ Database Host  
-                   -> String -- ^ Database Name
-                   -> String -- ^ Database User 
-                   -> Int    -- ^ System Id
-                   -> Int    -- ^ Load Case
-                   -> IO ()
-xrunStearnsWharf host dbname user sysId loadCase = 
-    getProfileContext host dbname user sysId loadCase >>= \ctx ->
-    let (rf,rd) = calcDeflections ctx 
-        result = beamResults ctx rf rd in
-    mapM_ OUT.printResults result >>
-    OUT.printNodeLoads (pointLoads ctx) >>
-    OUT.printSummary result >> 
-    return ()
--}
-
 getProfileContext :: String    -- ^ Database Host  
                      -> String -- ^ Database Name
                      -> String -- ^ Database User 
