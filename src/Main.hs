@@ -1,6 +1,19 @@
-{-# LANGUAGE FlexibleInstances,MultiParamTypeClasses,DeriveDataTypeable #-}
--- #define RCS_DEMO
+{-# LANGUAGE DeriveDataTypeable #-}
+--{-# LANGUAGE FlexibleInstances #-}
+--{-# LANGUAGE MultiParamTypeClasses #-}
 
+import System.Console.CmdArgs
+
+import StearnsWharf.CmdLine(cmd)
+import StearnsWharf.System (runStearnsWharf)
+
+
+main = cmdArgs cmd >>= \x -> 
+    putStrLn (show x) >>
+    runStearnsWharf x >>
+    return ()
+
+{--
 import System.Console.CmdLib -- (Attributes,Group,Help,ArgHelp,Default,RecordCommand)
 
 import StearnsWharf.System (runStearnsWharf)
@@ -31,3 +44,4 @@ main = getArgs >>= executeR Main {} >>= \opts ->
     -- putStrLn (printf "host=%s, dbname=%s, user=%s, sys.id=%d, load case=%d" (h opts) (db opts) (u opts) (s opts) (lc opts)) >>
     runStearnsWharf (h opts) (db opts) (u opts) (s opts) (lc opts) >>
     return ()
+-}

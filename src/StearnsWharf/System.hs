@@ -13,6 +13,7 @@ import Numeric.LinearAlgebra.Algorithms (inv)
 
 import Database.PostgreSQL.Simple (close)
 
+import qualified StearnsWharf.CmdLine as X
 import StearnsWharf.Common (getConnection)
 
 import qualified StearnsWharf.Repos.NodeRepository as NR
@@ -78,13 +79,14 @@ beamResults ProfileContext { steelProfiles,woodProfiles } vUltimateLimit vServic
                        | otherwise = map (OUT.collectResult vUltimateLimit vServicabilityLimit) steelProfiles 
 
 
-runStearnsWharf :: String    -- ^ Database Host  
+{-
+xrunStearnsWharf :: String    -- ^ Database Host  
                    -> String -- ^ Database Name
                    -> String -- ^ Database User 
                    -> Int    -- ^ System Id
                    -> Int    -- ^ Load Case
                    -> IO ()
-runStearnsWharf host dbname user sysId loadCase = 
+xrunStearnsWharf host dbname user sysId loadCase = 
     getProfileContext host dbname user sysId loadCase >>= \ctx ->
     let (rf,rd) = calcDeflections ctx 
         result = beamResults ctx rf rd in
@@ -92,6 +94,7 @@ runStearnsWharf host dbname user sysId loadCase =
     OUT.printNodeLoads (pointLoads ctx) >>
     OUT.printSummary result >> 
     return ()
+-}
 
 getProfileContext :: String    -- ^ Database Host  
                      -> String -- ^ Database Name
@@ -110,3 +113,14 @@ getProfileContext host dbname user sysId loadCase =
         ctx = ProfileContext steels woods px numDof in 
     close c >> 
     return ctx
+
+runStearnsWharf :: X.CmdLine -> IO ()
+runStearnsWharf x = 
+    getProfileContext (X.host x) (X.dbname x) (X.user x) (X.system x) (X.loadcase x) >>= \ctx ->
+    let (rf,rd) = calcDeflections ctx 
+        result = beamResults ctx rf rd in
+    mapM_ OUT.printResults result >>
+    OUT.printNodeLoads (pointLoads ctx) >>
+    OUT.printSummary result >> 
+    return ()
+
