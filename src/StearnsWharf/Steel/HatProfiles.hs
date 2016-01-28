@@ -34,12 +34,13 @@ createTEHP ::
               -> HatProfile
 createTEHP h tw bo to bu tu  = TEHP topP webP botP
     where topP = Pl.Plate bo to
-          webP = Pl.Plate tw (h - tw)
+          webP = Pl.Plate tw (h - tw) -- ^ h - tw pga geometri avslutning m/ kilsveis (se bilde div/THP.png)
           botP = Pl.Plate bu tu   
 
 instance P.Profile HatProfile where
     sigma    hp m = m / (1000.0 * (P.sectionModulus hp))
-    tau      hp s = 4.0 
+    tau      profile shr = (3.0*shr) / (2000.0 * (P.area profile))
+    area     TEHP { topPl,webPl,botPl } = (P.area topPl) + (2*(P.area webPl)) + (P.area botPl)
     area     HatProfileA { hup,plate } = (P.area hup) + (P.area plate)
     emodulus hp   = 200000.0
     sectionModulus hat@HatProfileA { hup, plate } = sam / y 

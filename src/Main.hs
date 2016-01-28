@@ -2,7 +2,7 @@
 
 import System.Console.CmdArgs
 
-import StearnsWharf.CmdLine(cmd)
+import StearnsWharf.CmdLine (cmd)
 import StearnsWharf.System (runStearnsWharf)
 
 

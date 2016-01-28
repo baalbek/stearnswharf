@@ -11,7 +11,7 @@ data CmdLine =
         system :: Int,
         loadcase :: Int } deriving (Show, Data, Typeable)
 
-cmd = CmdLine {
+cmdLine = CmdLine {
         host = "xochitecatl" &= groupname "Database",
         dbname = "engineer" &= groupname "Database",
         user = "engineer" &= groupname "Database",
