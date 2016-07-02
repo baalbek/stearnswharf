@@ -7,7 +7,7 @@ import Database.PostgreSQL.Simple (connectPostgreSQL)
 
 import qualified Data.ByteString.UTF8 as UTF8 
 import Numeric.LinearAlgebra (Vector)
-import Numeric.Container (vecdisp,dispf)
+-- import Numeric.Container (vecdisp,dispf)
 
 type BeamTypeId = String
 
@@ -23,7 +23,7 @@ data MomentType = FieldMoment | SupportMoment
 
 prnVec :: String -> Vector Double -> IO ()
 prnVec msg v = do
-    putStrLn $ msg ++ (vecdisp (dispf 2) v)
+    putStrLn $ msg -- ++ (vecdisp (dispf 2) v)
     --print $ v @> 0
     --
     --

@@ -10,7 +10,7 @@ import Text.Printf (printf)
 import qualified Data.Map as Map
 import Control.Monad.ST
 
-import Data.Packed.ST (STVector,modifyVector)
+import Numeric.LinearAlgebra.Devel (modifyVector,STVector)
 
 import StearnsWharf.Nodes (Node,systemIndexX,systemIndexY)
 import StearnsWharf.Common (radians)
