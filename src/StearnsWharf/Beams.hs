@@ -9,13 +9,10 @@ import Data.List ( find )
 
 import Control.Monad.ST ( ST )
 
-import Numeric.LinearAlgebra ( (<>),(|>),Matrix,Vector,fromList,fromLists,disp,dispf,tr,(#>) )
+import Numeric.LinearAlgebra ( (<>),(|>),(#>),Matrix,Vector,fromList,fromLists,disp,dispf,tr )
 
-import Numeric.LinearAlgebra.Devel ( modifyVector,modifyMatrix,STMatrix,STVector,extractMatrix,at',atM' )
+import Numeric.LinearAlgebra.Devel ( modifyVector,modifyMatrix,STMatrix,STVector,at',atM' )
 
--- import Numeric.LinearAlgebra.HMatrix
-
--- import qualified StearnsWharf.HMatrixUtil as HX
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L
 import qualified StearnsWharf.Materials as M

@@ -26,6 +26,6 @@ executable stearnswharf-5.0
                        ,mtl >= 2.2.1
                        ,postgresql-simple >= 0.5.2.0
                        ,utf8-string >= 1.0.1.1
-                       ,cmdlib >= 0.3.6 
+                       ,cmdargs >= 0.10.14
   hs-source-dirs: src
   ghc-options: -Wall -fno-warn-unused-do-bind
