@@ -12,10 +12,10 @@ data CmdLine =
         loadcase :: Int } deriving (Show, Data, Typeable)
 
 cmdLine = CmdLine {
-        host = "xochitecatl" &= groupname "Database",
+        host = "192.168.56.63" &= groupname "Database",
         dbname = "engineer" &= groupname "Database",
         user = "engineer" &= groupname "Database",
-        system = 0 &= groupname "System",
+        system = 15 &= groupname "System",
         loadcase = 1 &= groupname "System"}
 
 
