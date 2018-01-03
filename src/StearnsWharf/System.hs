@@ -8,10 +8,10 @@ import Control.Monad.Reader (runReader)
 import qualified Text.XML.Light as X 
 
 import Data.Map (elems)
-import Numeric.LinearAlgebra (Matrix,Vector)
-import Data.Packed.ST (newMatrix,runSTMatrix,newVector,runSTVector)
-import Numeric.Container ((<>))
-import Numeric.LinearAlgebra.Algorithms (inv)
+
+import Numeric.LinearAlgebra ((#>),Matrix,Vector,inv)
+import Numeric.LinearAlgebra.Devel (runSTMatrix,runSTVector,newVector,newMatrix)
+
 
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Loads as L
@@ -68,8 +68,8 @@ calcDeflections ctx@ProfileContext { pointLoads,numDof } = (resultForces,resultD
           sysSyWith = systemSY ctx L.WithFact
           sysPwo = systemPointLoads pointLoads numDof L.WoFact 
           sysPwith = systemPointLoads pointLoads numDof L.WithFact 
-          resultForces = invSysK <> (sysSyWo + sysPwo)
-          resultDeflections = invSysK <> (sysSyWith + sysPwith)
+          resultForces = invSysK #> (sysSyWo + sysPwo)
+          resultDeflections = invSysK #> (sysSyWith + sysPwith)
 
 beamResults :: ProfileContext -> Vector Double -> Vector Double -> [OUT.BeamResult]
 beamResults ProfileContext { steelProfiles,woodProfiles } vUltimateLimit vServicabilityLimit = concat [woodResults,steelResults]

@@ -3,8 +3,8 @@ module StearnsWharf.Output where
 
 import Text.Printf (printf)
 
-import Numeric.LinearAlgebra (Vector)
-import Data.Packed.Vector ((@>),subVector) 
+import Numeric.LinearAlgebra ( Vector,subVector )
+import Numeric.LinearAlgebra.Devel ( at' )
 
 import qualified StearnsWharf.Nodes as N
 import qualified StearnsWharf.Beams as B
@@ -25,19 +25,19 @@ data BeamResult = BeamResult { brId :: B.BeamId,
                                nr2 :: NodeResult } deriving Show
 
 shear :: NodeResult -> Double
-shear nr = (forces nr) @> 1
+shear nr = at' (forces nr) 1
     
 normalf :: NodeResult -> Double
-normalf nr = (forces nr) @> 0
+normalf nr = at' (forces nr) 0
 
 moment :: NodeResult -> Double
-moment nr = (forces nr) @> 2
+moment nr = at' (forces nr) 2
 
 yTrans :: NodeResult -> Double
-yTrans nr = (displacements nr) @> 1
+yTrans nr = at' (displacements nr) 1
 
 xTrans :: NodeResult -> Double
-xTrans nr = (displacements nr) @> 0
+xTrans nr = at' (displacements nr) 0
 
 collectResult :: P.Profile a => Vector Double -> Vector Double -> B.Beam a -> BeamResult
 collectResult vForces vDeflect beam = BeamResult (B.beamId beam) (P.desc $ B.bt beam) nr1 nr2
