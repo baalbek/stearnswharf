@@ -3,10 +3,9 @@
 import System.Console.CmdArgs
 
 import StearnsWharf.CmdLine (cmdLine)
-import StearnsWharf.System (runStearnsWharf)
+import StearnsWharf.System (runStearnsWharf,runStearnsWharfXML)
 
 main :: IO ()
 main = cmdArgs cmdLine >>= \x ->
     putStrLn (show x) >>
-    runStearnsWharf x >>
-    return ()
+    runStearnsWharfXML x 
