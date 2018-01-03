@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<system>
+    <nodes>
+        <!-- dof 1: 0 0 1, 2: 0 1 0, 4: 1 0 0,
+            3: 0 1 1, 5: 1 0 1, 6: 1 1 0, 7: 1 1 1 -->
+        <node id="1" x="0.0" y="0.0" dof="1" />
+        <node id="2" x="3.42" y="0.0" dof="3" />
+        <node id="3" x="7.67" y="0.0" dof="1" />
+        <!-- max wood 17.5 mm -->
+    </nodes>
+
+    <loads>
+        <load id="l1" f="1.44" y="-8.0" />
+    </loads>
+
+    <!--
+    <pointloads>
+        <pointload  f="1.45" v="-108" ang="90" node="2" />
+    </pointloads>
+    -->
+
+    <SteelProfiles default-dbid="30">
+        <DBSteelProfile id="b1" load="l1" n1="1" n2="2" />
+        <DBSteelProfile id="b2" load="l1" n1="2" n2="3" />
+    </SteelProfiles>
+
+    <!--
+    <WoodProfiles default-stclass="GL32C">
+        <Wood id="w1" h="270" w="140" load="l1" n1="1" n2="2" />
+        <Wood id="w2" h="270" w="140" load="l1" n1="2" n2="3" />
+    </WoodProfiles>
+    -->
+</system>
+
+
+
