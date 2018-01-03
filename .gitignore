@@ -1,6 +1,6 @@
-*.swp
-tmp
-src/demo
-dist
-stearnswharf-*
-*.ods#
+.cabal-sandbox/
+dist/
+cabal.sandbox.config
+src/ghci-sandbox
+tmp/
+
